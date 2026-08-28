@@ -1,3 +1,9 @@
+.prototype-frame {
+  border: 0;
+  display: block;
+  height: 100vh;
+  width: 100%;
+}
 .counter {
   font-size: 16px;
   padding: 5px 10px;
