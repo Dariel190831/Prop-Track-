@@ -208,6 +208,13 @@
       </div>
     </header>
 
+    <sc-if value="{{ loadError }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 40px; background:#B4553C1a; border-bottom:1px solid #B4553C55; font-size:13px; color:#8E3E29">
+        <span>No se pudieron cargar algunos datos. Puede ser un problema de conexión pasajero.</span>
+        <span onClick="{{ reintentar }}" style="font-weight:600; cursor:pointer; white-space:nowrap" style-hover="color:#B4553C">Reintentar →</span>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ isResumen }}" hint-placeholder-val="{{ true }}">
       <div style="padding:38px 40px 56px">
         <div style="font-family:'Newsreader', serif; font-size:38px; font-weight:600; letter-spacing:-.015em">{{ saludo }}</div>
@@ -433,7 +440,7 @@ class Component extends DCLogic {
     screen: "resumen", filtro: "Todas", activa: null,
     vista: "login", modo: "Ingresar", plan: "mensual",
     nombre: "", usuario: "", clave: "", verClave: false, error: false,
-    loading: false, authMsg: "", busqueda: "",
+    loading: false, authMsg: "", busqueda: "", loadError: false,
     session: null, profile: null,
     properties: [], clients: [], deals: [], activities: [], matches: []
   };
@@ -467,27 +474,39 @@ class Component extends DCLogic {
   }
 
   async loadAll(userId) {
-    this.setState({ loading: true });
+    this.setState({ loading: true, loadError: false });
     // Justo tras el login, el JWT recién emitido a veces llega a PostgREST antes de que
-    // su reloj lo considere válido ("JWT issued at future" / PGRST303). Reintenta una vez.
-    const withRetry = async (build) => {
-      let res = await build();
-      if (res.error && res.error.code === "PGRST303") {
-        await new Promise(r => setTimeout(r, 800));
-        res = await build();
+    // su reloj lo considere válido, o hay un hueco de red. Cada intento tiene un límite
+    // de tiempo (una consulta colgada no debe dejar la app cargando para siempre) y
+    // reintenta hasta 2 veces con backoff antes de darse por vencido.
+    const attempt = async (build) => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 7000);
+      try { return await build(controller.signal); }
+      catch (e) { return { data: null, error: e }; }
+      finally { clearTimeout(timer); }
+    };
+    const withRetry = async (build, tag) => {
+      let res = await attempt(build);
+      for (let i = 0; i < 2 && res.error; i++) {
+        await new Promise(r => setTimeout(r, 700 * (i + 1)));
+        res = await attempt(build);
       }
+      if (res.error) console.error("PropTrack: fallo cargando " + tag, res.error);
       return res;
     };
     const [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes] = await Promise.all([
-      withRetry(() => sb.from("profiles").select("*").eq("id", userId).single()),
-      withRetry(() => sb.from("properties").select("*").eq("user_id", userId).order("created_at")),
-      withRetry(() => sb.from("clients").select("*").eq("user_id", userId).order("created_at")),
-      withRetry(() => sb.from("deals").select("*, properties(titulo)").eq("user_id", userId).order("fecha_cierre", { ascending: false })),
-      withRetry(() => sb.from("activities").select("*").eq("user_id", userId).order("created_at", { ascending: false })),
-      withRetry(() => sb.from("matches").select("*, clients(nombre), properties(titulo)").eq("user_id", userId))
+      withRetry(sig => sb.from("profiles").select("*").eq("id", userId).abortSignal(sig).single(), "profiles"),
+      withRetry(sig => sb.from("properties").select("*").eq("user_id", userId).abortSignal(sig).order("created_at"), "properties"),
+      withRetry(sig => sb.from("clients").select("*").eq("user_id", userId).abortSignal(sig).order("created_at"), "clients"),
+      withRetry(sig => sb.from("deals").select("*, properties(titulo)").eq("user_id", userId).abortSignal(sig).order("fecha_cierre", { ascending: false }), "deals"),
+      withRetry(sig => sb.from("activities").select("*").eq("user_id", userId).abortSignal(sig).order("created_at", { ascending: false }), "activities"),
+      withRetry(sig => sb.from("matches").select("*, clients(nombre), properties(titulo)").eq("user_id", userId).abortSignal(sig), "matches")
     ]);
+    const anyError = [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes].some(r => r.error);
     this.setState({
       loading: false,
+      loadError: anyError,
       profile: profileRes.data,
       plan: (profileRes.data && profileRes.data.plan) || "mensual",
       properties: propsRes.data || [],
@@ -682,6 +701,8 @@ class Component extends DCLogic {
       isResumen: s === "resumen", isProps: s === "props", isClientes: s === "clientes", isComisiones: s === "comisiones",
       goClientes: () => this.setState({ screen: "clientes" }),
       mapRef: el => { this.mapEl = el; },
+      loadError: st.loadError,
+      reintentar: () => { const uid = st.session && st.session.user && st.session.user.id; if (uid) this.loadAll(uid); },
       kpis, matches, feed,
       metaCobrado: fmtL(cobrado), metaObjetivo: Math.round(metaObjetivoNum).toLocaleString("en-US"),
       metaBarStyle: `width:${metaPct}%; height:100%; background:#C08A3E; border-radius:99px`,
