@@ -26,7 +26,7 @@
     <div style="background:#101F2B; color:#F4F0E8; padding:56px 60px; display:flex; flex-direction:column; justify-content:space-between">
       <div>
         <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">PropTrack</div>
-        <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.16em; color:#8FA3B2; margin-top:6px">TEGUCIGALPA · HN</div>
+        <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.16em; color:#8FA3B2; margin-top:6px">SAN PEDRO SULA · HN</div>
       </div>
       <div>
         <div style="font-family:'Newsreader', serif; font-size:40px; font-weight:500; line-height:1.15; letter-spacing:-.02em">Tu cartera de<br>propiedades,<br>en un solo mapa.</div>
@@ -161,7 +161,7 @@
   <aside style="width:260px; flex:none; background:#101F2B; color:#F4F0E8; display:flex; flex-direction:column; padding:28px 18px; position:sticky; top:0; height:100vh">
     <div style="padding:0 10px 26px 10px; border-bottom:1px solid rgba(244,240,232,.12)">
       <div style="font-family:'Newsreader', serif; font-size:27px; font-weight:600; letter-spacing:-.01em">PropTrack</div>
-      <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.16em; color:#8FA3B2; margin-top:6px">TEGUCIGALPA · HN</div>
+      <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.16em; color:#8FA3B2; margin-top:6px">SAN PEDRO SULA · HN</div>
     </div>
 
     <nav style="display:flex; flex-direction:column; gap:4px; margin-top:22px">
@@ -284,6 +284,7 @@
             <div style="font-family:'Newsreader', serif; font-size:26px; font-weight:600">Propiedades</div>
             <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#6B7480">{{ propsCount }}</span>
           </div>
+          <div onClick="{{ abrirNuevaProp }}" style="margin-top:14px; background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px; text-align:center; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">+ Agregar propiedad</div>
           <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
             <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
               <div onClick="{{ f.go }}" style="{{ f.style }}">{{ f.label }}</div>
@@ -328,8 +329,13 @@
 
     <sc-if value="{{ isClientes }}" hint-placeholder-val="{{ false }}">
       <div style="padding:38px 40px 56px">
-        <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">Clientes</div>
-        <div style="color:#5E6771; font-size:14.5px; margin-top:5px">Seguimiento del embudo, de primer contacto a cierre.</div>
+        <div style="display:flex; align-items:baseline; justify-content:space-between">
+          <div>
+            <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">Clientes</div>
+            <div style="color:#5E6771; font-size:14.5px; margin-top:5px">Seguimiento del embudo, de primer contacto a cierre.</div>
+          </div>
+          <div onClick="{{ abrirNuevoCliente }}" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
+        </div>
         <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:26px; align-items:start">
           <sc-for list="{{ pipeline }}" as="col" hint-placeholder-count="4">
             <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:16px; padding:16px">
@@ -397,6 +403,122 @@
       </div>
     </sc-if>
 
+    <sc-if value="{{ showAddProp }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed; inset:0; background:rgba(16,31,43,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:24px">
+        <div style="background:#FBF9F5; border-radius:18px; padding:28px 30px; width:100%; max-width:460px; max-height:90vh; overflow:auto; box-shadow:0 20px 60px rgba(20,33,43,.3)">
+          <div style="font-family:'Newsreader', serif; font-size:21px; font-weight:600">Nueva propiedad</div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:18px">
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">TÍTULO</span>
+              <input value="{{ npTitulo }}" onChange="{{ setNpTitulo }}" placeholder="Casa Residencial..." style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">ZONA / COLONIA</span>
+              <input value="{{ npZona }}" onChange="{{ setNpZona }}" placeholder="Ej. Jardines del Valle" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+            </label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">TIPO</span>
+                <select value="{{ npTipo }}" onChange="{{ setNpTipo }}" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+                  <option value="Casa">Casa</option>
+                  <option value="Apartamento">Apartamento</option>
+                  <option value="Terreno">Terreno</option>
+                  <option value="Local">Local</option>
+                </select>
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">ESTADO</span>
+                <select value="{{ npEstado }}" onChange="{{ setNpEstado }}" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+                  <option value="Disponible">Disponible</option>
+                  <option value="Negociando">Negociando</option>
+                  <option value="Vendida">Vendida</option>
+                </select>
+              </label>
+            </div>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">PRECIO (L.)</span>
+              <input value="{{ npPrecio }}" onChange="{{ setNpPrecio }}" type="number" placeholder="1850000" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'JetBrains Mono', monospace; font-size:13.5px; outline:none">
+            </label>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">HAB.</span>
+                <input value="{{ npHabitaciones }}" onChange="{{ setNpHabitaciones }}" type="number" placeholder="3" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'JetBrains Mono', monospace; font-size:13.5px; outline:none">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">ÁREA</span>
+                <input value="{{ npArea }}" onChange="{{ setNpArea }}" type="number" placeholder="180" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'JetBrains Mono', monospace; font-size:13.5px; outline:none">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">UNIDAD</span>
+                <select value="{{ npAreaUnidad }}" onChange="{{ setNpAreaUnidad }}" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+                  <option value="m2">m²</option>
+                  <option value="v2">v²</option>
+                </select>
+              </label>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">LATITUD (opcional)</span>
+                <input value="{{ npLat }}" onChange="{{ setNpLat }}" type="number" placeholder="15.5041" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'JetBrains Mono', monospace; font-size:13.5px; outline:none">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">LONGITUD (opcional)</span>
+                <input value="{{ npLng }}" onChange="{{ setNpLng }}" type="number" placeholder="-88.0250" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'JetBrains Mono', monospace; font-size:13.5px; outline:none">
+              </label>
+            </div>
+            <div style="font-size:11.5px; color:#8B939C; line-height:1.5">Sin coordenadas la propiedad no aparece en el mapa, pero sí en la lista. Puedes copiarlas haciendo clic derecho sobre el punto exacto en Google Maps.</div>
+            <sc-if value="{{ npError }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:9px; padding:9px 12px; font-size:12.5px; color:#8E3E29">{{ npError }}</div>
+            </sc-if>
+            <div style="display:flex; gap:10px; margin-top:8px">
+              <div onClick="{{ cerrarNuevaProp }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
+              <div onClick="{{ guardarNuevaProp }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">{{ npGuardarLabel }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showAddClient }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed; inset:0; background:rgba(16,31,43,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:24px">
+        <div style="background:#FBF9F5; border-radius:18px; padding:28px 30px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(20,33,43,.3)">
+          <div style="font-family:'Newsreader', serif; font-size:21px; font-weight:600">Nuevo cliente</div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:18px">
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">NOMBRE</span>
+              <input value="{{ ncNombre }}" onChange="{{ setNcNombre }}" placeholder="Nombre del cliente" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">QUÉ BUSCA</span>
+              <input value="{{ ncBusca }}" onChange="{{ setNcBusca }}" placeholder="Ej. Casa 3 hab en Jardines del Valle" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+            </label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">PRESUPUESTO (L.)</span>
+                <input value="{{ ncPresupuesto }}" onChange="{{ setNcPresupuesto }}" type="number" placeholder="2000000" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'JetBrains Mono', monospace; font-size:13.5px; outline:none">
+              </label>
+              <label style="display:flex; flex-direction:column; gap:6px">
+                <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">ETAPA</span>
+                <select value="{{ ncEtapa }}" onChange="{{ setNcEtapa }}" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+                  <option value="Contacto">Contacto</option>
+                  <option value="Visita">Visita</option>
+                  <option value="Negociando">Negociando</option>
+                  <option value="Cerrado">Cerrado</option>
+                </select>
+              </label>
+            </div>
+            <sc-if value="{{ ncError }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:9px; padding:9px 12px; font-size:12.5px; color:#8E3E29">{{ ncError }}</div>
+            </sc-if>
+            <div style="display:flex; gap:10px; margin-top:8px">
+              <div onClick="{{ cerrarNuevoCliente }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
+              <div onClick="{{ guardarNuevoCliente }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">{{ ncGuardarLabel }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
   </main>
 </div>
 </sc-if>
@@ -442,7 +564,12 @@ class Component extends DCLogic {
     nombre: "", usuario: "", clave: "", verClave: false, error: false,
     loading: false, authMsg: "", busqueda: "", loadError: false,
     session: null, profile: null,
-    properties: [], clients: [], deals: [], activities: [], matches: []
+    properties: [], clients: [], deals: [], activities: [], matches: [],
+    showAddProp: false, savingProp: false, npError: "",
+    npTitulo: "", npZona: "", npTipo: "Casa", npEstado: "Disponible",
+    npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: "",
+    showAddClient: false, savingClient: false, ncError: "",
+    ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto"
   };
   mapEl = null;
 
@@ -496,7 +623,7 @@ class Component extends DCLogic {
       return res;
     };
     const [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes] = await Promise.all([
-      withRetry(sig => sb.from("profiles").select("*").eq("id", userId).abortSignal(sig).single(), "profiles"),
+      withRetry(sig => sb.from("profiles").select("*").eq("id", userId).abortSignal(sig).maybeSingle(), "profiles"),
       withRetry(sig => sb.from("properties").select("*").eq("user_id", userId).abortSignal(sig).order("created_at"), "properties"),
       withRetry(sig => sb.from("clients").select("*").eq("user_id", userId).abortSignal(sig).order("created_at"), "clients"),
       withRetry(sig => sb.from("deals").select("*, properties(titulo)").eq("user_id", userId).abortSignal(sig).order("fecha_cierre", { ascending: false }), "deals"),
@@ -516,6 +643,57 @@ class Component extends DCLogic {
       matches: matchesRes.data || []
     });
     this.sendPropsToMap();
+  }
+
+  async guardarNuevaProp() {
+    const s = this.state;
+    const userId = s.session && s.session.user && s.session.user.id;
+    if (!userId) return;
+    if (!s.npTitulo.trim() || !s.npZona.trim() || !s.npPrecio) {
+      return this.setState({ npError: "Completá al menos título, zona y precio." });
+    }
+    this.setState({ savingProp: true, npError: "" });
+    const { error } = await sb.from("properties").insert({
+      user_id: userId,
+      titulo: s.npTitulo.trim(),
+      zona: s.npZona.trim(),
+      tipo: s.npTipo,
+      estado: s.npEstado,
+      precio: Number(s.npPrecio),
+      habitaciones: s.npHabitaciones ? Number(s.npHabitaciones) : null,
+      area: s.npArea ? Number(s.npArea) : null,
+      area_unidad: s.npArea ? s.npAreaUnidad : null,
+      lat: s.npLat !== "" ? Number(s.npLat) : null,
+      lng: s.npLng !== "" ? Number(s.npLng) : null
+    });
+    if (error) return this.setState({ savingProp: false, npError: "No se pudo guardar: " + error.message });
+    this.setState({
+      savingProp: false, showAddProp: false,
+      npTitulo: "", npZona: "", npTipo: "Casa", npEstado: "Disponible",
+      npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: ""
+    });
+    this.loadAll(userId);
+  }
+
+  async guardarNuevoCliente() {
+    const s = this.state;
+    const userId = s.session && s.session.user && s.session.user.id;
+    if (!userId) return;
+    if (!s.ncNombre.trim()) return this.setState({ ncError: "Ingresá el nombre del cliente." });
+    this.setState({ savingClient: true, ncError: "" });
+    const { error } = await sb.from("clients").insert({
+      user_id: userId,
+      nombre: s.ncNombre.trim(),
+      busca: s.ncBusca.trim() || null,
+      presupuesto: s.ncPresupuesto ? Number(s.ncPresupuesto) : null,
+      etapa: s.ncEtapa
+    });
+    if (error) return this.setState({ savingClient: false, ncError: "No se pudo guardar: " + error.message });
+    this.setState({
+      savingClient: false, showAddClient: false,
+      ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto"
+    });
+    this.loadAll(userId);
   }
 
   renderVals() {
@@ -722,7 +900,35 @@ class Component extends DCLogic {
           }));
         return { label: etapa, n: String(cards.length), cards };
       }),
-      comKpis, bars, rows
+      comKpis, bars, rows,
+
+      showAddProp: st.showAddProp,
+      abrirNuevaProp: () => this.setState({ showAddProp: true, npError: "" }),
+      cerrarNuevaProp: () => this.setState({ showAddProp: false, npError: "" }),
+      npGuardarLabel: st.savingProp ? "Guardando…" : "Guardar propiedad",
+      npError: st.npError,
+      npTitulo: st.npTitulo, setNpTitulo: e => this.setState({ npTitulo: e.target.value }),
+      npZona: st.npZona, setNpZona: e => this.setState({ npZona: e.target.value }),
+      npTipo: st.npTipo, setNpTipo: e => this.setState({ npTipo: e.target.value }),
+      npEstado: st.npEstado, setNpEstado: e => this.setState({ npEstado: e.target.value }),
+      npPrecio: st.npPrecio, setNpPrecio: e => this.setState({ npPrecio: e.target.value }),
+      npHabitaciones: st.npHabitaciones, setNpHabitaciones: e => this.setState({ npHabitaciones: e.target.value }),
+      npArea: st.npArea, setNpArea: e => this.setState({ npArea: e.target.value }),
+      npAreaUnidad: st.npAreaUnidad, setNpAreaUnidad: e => this.setState({ npAreaUnidad: e.target.value }),
+      npLat: st.npLat, setNpLat: e => this.setState({ npLat: e.target.value }),
+      npLng: st.npLng, setNpLng: e => this.setState({ npLng: e.target.value }),
+      guardarNuevaProp: () => this.guardarNuevaProp(),
+
+      showAddClient: st.showAddClient,
+      abrirNuevoCliente: () => this.setState({ showAddClient: true, ncError: "" }),
+      cerrarNuevoCliente: () => this.setState({ showAddClient: false, ncError: "" }),
+      ncGuardarLabel: st.savingClient ? "Guardando…" : "Guardar cliente",
+      ncError: st.ncError,
+      ncNombre: st.ncNombre, setNcNombre: e => this.setState({ ncNombre: e.target.value }),
+      ncBusca: st.ncBusca, setNcBusca: e => this.setState({ ncBusca: e.target.value }),
+      ncPresupuesto: st.ncPresupuesto, setNcPresupuesto: e => this.setState({ ncPresupuesto: e.target.value }),
+      ncEtapa: st.ncEtapa, setNcEtapa: e => this.setState({ ncEtapa: e.target.value }),
+      guardarNuevoCliente: () => this.guardarNuevoCliente()
     };
   }
 }
