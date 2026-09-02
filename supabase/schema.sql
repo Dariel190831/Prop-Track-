@@ -24,10 +24,13 @@ create table if not exists public.properties (
   habitaciones int,
   area numeric,
   area_unidad text check (area_unidad in ('m2','v2')),
+  descripcion text,
   lat double precision,
   lng double precision,
   created_at timestamptz not null default now()
 );
+
+alter table public.properties add column if not exists descripcion text;
 
 create table if not exists public.clients (
   id uuid primary key default gen_random_uuid(),

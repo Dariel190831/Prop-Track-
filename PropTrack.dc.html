@@ -309,6 +309,9 @@
                     </div>
                   </div>
                 </div>
+                <sc-if value="{{ p.expandido }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(20,33,43,.08); font-size:12.5px; color:#5E6771; line-height:1.55">{{ p.descripcionTexto }}</div>
+                </sc-if>
               </div>
             </sc-for>
           </div>
@@ -415,6 +418,10 @@
             <label style="display:flex; flex-direction:column; gap:6px">
               <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">ZONA / COLONIA</span>
               <input value="{{ npZona }}" onChange="{{ setNpZona }}" placeholder="Ej. Jardines del Valle" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none">
+            </label>
+            <label style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">DESCRIPCIÓN (opcional)</span>
+              <textarea value="{{ npDescripcion }}" onChange="{{ setNpDescripcion }}" placeholder="Detalles de la propiedad: acabados, amenidades, estado..." rows="3" style="border:1px solid rgba(20,33,43,.16); background:#fff; border-radius:9px; padding:10px 12px; font-family:'Work Sans', sans-serif; font-size:13.5px; outline:none; resize:vertical"></textarea>
             </label>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
               <label style="display:flex; flex-direction:column; gap:6px">
@@ -566,7 +573,7 @@ class Component extends DCLogic {
     session: null, profile: null,
     properties: [], clients: [], deals: [], activities: [], matches: [],
     showAddProp: false, savingProp: false, npError: "",
-    npTitulo: "", npZona: "", npTipo: "Casa", npEstado: "Disponible",
+    npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
     npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: "",
     showAddClient: false, savingClient: false, ncError: "",
     ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto"
@@ -595,7 +602,7 @@ class Component extends DCLogic {
   sendPropsToMap() {
     const mapProps = (this.state.properties || []).map(p => ({
       id: p.id, t: p.titulo, z: p.zona, tipo: p.tipo, est: p.estado,
-      p: fmtL(p.precio), lat: p.lat, lng: p.lng
+      p: fmtL(p.precio), descripcion: p.descripcion || "", lat: p.lat, lng: p.lng
     })).filter(p => p.lat != null && p.lng != null);
     this.post({ type: "load", props: mapProps });
   }
@@ -657,6 +664,7 @@ class Component extends DCLogic {
       user_id: userId,
       titulo: s.npTitulo.trim(),
       zona: s.npZona.trim(),
+      descripcion: s.npDescripcion.trim() || null,
       tipo: s.npTipo,
       estado: s.npEstado,
       precio: Number(s.npPrecio),
@@ -669,7 +677,7 @@ class Component extends DCLogic {
     if (error) return this.setState({ savingProp: false, npError: "No se pudo guardar: " + error.message });
     this.setState({
       savingProp: false, showAddProp: false,
-      npTitulo: "", npZona: "", npTipo: "Casa", npEstado: "Disponible",
+      npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
       npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: ""
     });
     this.loadAll(userId);
@@ -709,6 +717,7 @@ class Component extends DCLogic {
 
     const propsData = (this.state.properties || []).map(p => ({
       id: p.id, t: p.titulo, z: p.zona, p: fmtL(p.precio), est: p.estado, tipo: p.tipo,
+      descripcion: p.descripcion || "",
       meta: [p.habitaciones ? `${p.habitaciones} hab` : null, fmtArea(p.area, p.area_unidad)].filter(Boolean).join(" · ")
     }));
     const col = { Disponible: GREEN, Negociando: GOLD, Vendida: RED };
@@ -721,9 +730,11 @@ class Component extends DCLogic {
     const q = (this.state.busqueda || "").trim().toLowerCase();
     const propsList = propsData.filter(p => (f === "Todas" || p.tipo === f) && (!q || p.t.toLowerCase().includes(q) || (p.z || "").toLowerCase().includes(q))).map(p => ({
       ...p,
-      go: () => { this.setState({ activa: p.id }); this.post({ type: "focus", id: p.id }); },
+      go: () => { this.setState({ activa: this.state.activa === p.id ? null : p.id }); this.post({ type: "focus", id: p.id }); },
       cardStyle: `background:#FBF9F5; border:1px solid ${this.state.activa === p.id ? "rgba(192,138,62,.75)" : "rgba(20,33,43,.08)"}; border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s ease`,
-      badge: `font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 8px; border-radius:99px; white-space:nowrap; color:${col[p.est]}; background:${col[p.est]}1f`
+      badge: `font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 8px; border-radius:99px; white-space:nowrap; color:${col[p.est]}; background:${col[p.est]}1f`,
+      expandido: this.state.activa === p.id,
+      descripcionTexto: p.descripcion || "Sin descripción disponible."
     }));
 
     const st = this.state;
@@ -909,6 +920,7 @@ class Component extends DCLogic {
       npError: st.npError,
       npTitulo: st.npTitulo, setNpTitulo: e => this.setState({ npTitulo: e.target.value }),
       npZona: st.npZona, setNpZona: e => this.setState({ npZona: e.target.value }),
+      npDescripcion: st.npDescripcion, setNpDescripcion: e => this.setState({ npDescripcion: e.target.value }),
       npTipo: st.npTipo, setNpTipo: e => this.setState({ npTipo: e.target.value }),
       npEstado: st.npEstado, setNpEstado: e => this.setState({ npEstado: e.target.value }),
       npPrecio: st.npPrecio, setNpPrecio: e => this.setState({ npPrecio: e.target.value }),

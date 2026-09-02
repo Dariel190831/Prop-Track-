@@ -27,6 +27,7 @@
   .pop-t { font-family:"Newsreader", serif; font-size:17px; font-weight:600; color:#14212B; margin-bottom:2px; }
   .pop-s { font-size:12px; color:#6B7480; }
   .pop-p { margin-top:8px; font-family:"JetBrains Mono", monospace; font-size:14px; color:#8A5E1F; }
+  .pop-d { margin-top:8px; font-size:12px; color:#5E6771; line-height:1.5; }
   .leaflet-bar a { color:#14212B; }
 </style>
 </head>
@@ -34,6 +35,7 @@
 <div id="map"></div>
 <script>
 const color = { Disponible:"#3E7C6B", Negociando:"#C08A3E", Vendida:"#B4553C" };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const DEFAULT_CENTER = [15.5041,-88.0250]; // San Pedro Sula
 const DEFAULT_ZOOM = 13;
 
@@ -59,9 +61,10 @@ function renderProps(props) {
   markers = {};
   (props || []).forEach(p => {
     if (p.lat == null || p.lng == null) return;
-    const html = `<div class="pin" data-id="${p.id}"><span class="dot" style="background:${color[p.est] || '#8B939C'}"></span>${p.p}</div>`;
+    const html = `<div class="pin" data-id="${esc(p.id)}"><span class="dot" style="background:${color[p.est] || '#8B939C'}"></span>${esc(p.p)}</div>`;
     const m = L.marker([p.lat, p.lng], { icon: L.divIcon({ html, className:'', iconSize:null, iconAnchor:[0,0] }) }).addTo(map);
-    m.bindPopup(`<div class="pop-t">${p.t}</div><div class="pop-s">${p.tipo} · ${p.z} · ${p.est}</div><div class="pop-p">${p.p}</div>`);
+    const desc = p.descripcion ? `<div class="pop-d">${esc(p.descripcion)}</div>` : '';
+    m.bindPopup(`<div class="pop-t">${esc(p.t)}</div><div class="pop-s">${esc(p.tipo)} · ${esc(p.z)} · ${esc(p.est)}</div><div class="pop-p">${esc(p.p)}</div>${desc}`, { maxWidth: 260 });
     markers[p.id] = m;
   });
   // Nivel nacional: encuadra automáticamente todas las propiedades reales, sin importar la ciudad.
