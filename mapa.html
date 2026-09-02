@@ -33,37 +33,39 @@
 <body>
 <div id="map"></div>
 <script>
-const props = [
-  { id:1, t:"Casa Residencial Los Andes", z:"Col. Los Andes", p:"L. 3,850,000", tipo:"Casa", est:"Disponible", ll:[14.0938,-87.2075] },
-  { id:2, t:"Apartamento Torre Aria", z:"Lomas del Guijarro", p:"L. 2,150,000", tipo:"Apartamento", est:"Negociando", ll:[14.0872,-87.1780] },
-  { id:3, t:"Casa Colonia Trejo", z:"Col. Trejo", p:"L. 1,980,000", tipo:"Casa", est:"Disponible", ll:[14.0965,-87.2170] },
-  { id:4, t:"Local comercial Río de Piedras", z:"Río de Piedras", p:"L. 4,400,000", tipo:"Local", est:"Vendida", ll:[14.0805,-87.1990] },
-  { id:5, t:"Terreno El Hatillo", z:"El Hatillo", p:"L. 950,000", tipo:"Terreno", est:"Disponible", ll:[14.1355,-87.2015] },
-  { id:6, t:"Apartamento Palmira 402", z:"Col. Palmira", p:"L. 2,650,000", tipo:"Apartamento", est:"Disponible", ll:[14.0993,-87.1930] }
-];
 const color = { Disponible:"#3E7C6B", Negociando:"#C08A3E", Vendida:"#B4553C" };
+const DEFAULT_CENTER = [14.0975,-87.1985];
 
-const map = L.map('map', { zoomControl:true, scrollWheelZoom:true }).setView([14.0975,-87.1985], 13);
+const map = L.map('map', { zoomControl:true, scrollWheelZoom:true }).setView(DEFAULT_CENTER, 13);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors', maxZoom: 19
 }).addTo(map);
 
-const markers = {};
-props.forEach(p => {
-  const html = `<div class="pin" data-id="${p.id}"><span class="dot" style="background:${color[p.est]}"></span>${p.p}</div>`;
-  const m = L.marker(p.ll, { icon: L.divIcon({ html, className:'', iconSize:null, iconAnchor:[0,0] }) }).addTo(map);
-  m.bindPopup(`<div class="pop-t">${p.t}</div><div class="pop-s">${p.tipo} · ${p.z} · ${p.est}</div><div class="pop-p">${p.p}</div>`);
-  markers[p.id] = m;
-});
+let markers = {};
+
+function renderProps(props) {
+  Object.values(markers).forEach(m => map.removeLayer(m));
+  markers = {};
+  (props || []).forEach(p => {
+    if (p.lat == null || p.lng == null) return;
+    const html = `<div class="pin" data-id="${p.id}"><span class="dot" style="background:${color[p.est] || '#8B939C'}"></span>${p.p}</div>`;
+    const m = L.marker([p.lat, p.lng], { icon: L.divIcon({ html, className:'', iconSize:null, iconAnchor:[0,0] }) }).addTo(map);
+    m.bindPopup(`<div class="pop-t">${p.t}</div><div class="pop-s">${p.tipo} · ${p.z} · ${p.est}</div><div class="pop-p">${p.p}</div>`);
+    markers[p.id] = m;
+  });
+}
 
 window.addEventListener('message', e => {
   const d = e.data || {};
+  if (d.type === 'load') renderProps(d.props);
   if (d.type === 'focus' && markers[d.id]) {
     map.flyTo(markers[d.id].getLatLng(), 15, { duration:.7 });
     markers[d.id].openPopup();
   }
-  if (d.type === 'reset') { map.flyTo([14.0975,-87.1985], 13, { duration:.6 }); map.closePopup(); }
+  if (d.type === 'reset') { map.flyTo(DEFAULT_CENTER, 13, { duration:.6 }); map.closePopup(); }
 });
+
+window.parent.postMessage({ type: 'ready' }, '*');
 </script>
 </body>
 </html>

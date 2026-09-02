@@ -10,6 +10,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   body { margin:0; background:#EFEAE0; }
   * { box-sizing:border-box; }
@@ -74,7 +75,7 @@
           </label>
 
           <sc-if value="{{ mostrarError }}" hint-placeholder-val="{{ false }}">
-            <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:10px; padding:10px 13px; font-size:12.5px; color:#8E3E29">Ingresá usuario y contraseña para continuar.</div>
+            <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:10px; padding:10px 13px; font-size:12.5px; color:#8E3E29">{{ authMsgText }}</div>
           </sc-if>
 
           <div onClick="{{ entrar }}" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:4px" style-hover="background:#1B3040">{{ authCta }}</div>
@@ -145,7 +146,7 @@
             <span style="font-size:13.5px; font-weight:600">Hoy pagás</span>
             <span style="font-family:'Newsreader', serif; font-size:26px">$0.00</span>
           </div>
-          <div style="font-size:11.5px; color:#8B939C; margin-top:8px; line-height:1.5">Luego {{ planPrecio }} {{ planPeriodo }} a partir del 27 de agosto.</div>
+          <div style="font-size:11.5px; color:#8B939C; margin-top:8px; line-height:1.5">Luego {{ planPrecio }} {{ planPeriodo }} a partir del {{ fechaPrueba }}.</div>
           <div onClick="{{ activar }}" style="background:#C08A3E; color:#101F2B; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#D19B4C">Activar suscripción</div>
           <div onClick="{{ salir }}" style="text-align:center; font-size:12.5px; color:#6B7480; margin-top:12px; cursor:pointer" style-hover="color:#8A5E1F">Volver al inicio de sesión</div>
         </div>
@@ -175,9 +176,9 @@
     <div style="margin-top:auto; display:flex; flex-direction:column; gap:14px">
       <div style="background:rgba(192,138,62,.14); border:1px solid rgba(192,138,62,.3); border-radius:12px; padding:14px 16px">
         <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.14em; color:#D9AE6E">META DEL MES</div>
-        <div style="font-family:'Newsreader', serif; font-size:22px; margin-top:6px">L. 85,500 <span style="font-size:13px; color:#8FA3B2; font-family:'Work Sans', sans-serif">/ 120,000</span></div>
+        <div style="font-family:'Newsreader', serif; font-size:22px; margin-top:6px">{{ metaCobrado }} <span style="font-size:13px; color:#8FA3B2; font-family:'Work Sans', sans-serif">/ {{ metaObjetivo }}</span></div>
         <div style="height:5px; border-radius:99px; background:rgba(244,240,232,.15); margin-top:10px; overflow:hidden">
-          <div style="width:71%; height:100%; background:#C08A3E; border-radius:99px"></div>
+          <div style="{{ metaBarStyle }}"></div>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:11px; padding:10px; border-radius:12px; background:rgba(244,240,232,.06)">
@@ -203,13 +204,13 @@
           <span style="opacity:.45; font-size:13px">⌕</span>
           <input placeholder="Buscar propiedad, cliente o zona" style="border:none; background:transparent; outline:none; font-family:'Work Sans', sans-serif; font-size:13px; width:100%; color:#14212B">
         </div>
-        <span style="font-family:'JetBrains Mono', monospace; font-size:11.5px; color:#6B7480">11 AGO 2026</span>
+        <span style="font-family:'JetBrains Mono', monospace; font-size:11.5px; color:#6B7480">{{ fechaHoy }}</span>
       </div>
     </header>
 
     <sc-if value="{{ isResumen }}" hint-placeholder-val="{{ true }}">
       <div style="padding:38px 40px 56px">
-        <div style="font-family:'Newsreader', serif; font-size:38px; font-weight:600; letter-spacing:-.015em">Buen día, Dariel</div>
+        <div style="font-family:'Newsreader', serif; font-size:38px; font-weight:600; letter-spacing:-.015em">{{ saludo }}</div>
         <div style="color:#5E6771; font-size:15px; margin-top:6px">Esto es lo que necesitás saber hoy sobre tu cartera.</div>
 
         <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:28px">
@@ -274,7 +275,7 @@
         <div style="border-right:1px solid rgba(20,33,43,.09); padding:26px 24px; overflow:auto; max-height:calc(100vh - 69px)">
           <div style="display:flex; align-items:baseline; justify-content:space-between">
             <div style="font-family:'Newsreader', serif; font-size:26px; font-weight:600">Propiedades</div>
-            <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#6B7480">6 activas</span>
+            <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#6B7480">{{ propsCount }}</span>
           </div>
           <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
             <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
@@ -397,15 +398,98 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
 const GOLD = "#C08A3E", GREEN = "#3E7C6B", RED = "#B4553C";
 
+const SUPABASE_URL = "https://oqcqxjrbhoaxowxrwlmr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_q-tkFGZQimwEJzsaMXYihA_igJZXd5k";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const fmtL = n => "L. " + Math.round(Number(n) || 0).toLocaleString("en-US");
+const fmtArea = (area, unidad) => area ? `${Number(area).toLocaleString("en-US")} ${unidad === "v2" ? "v²" : "m²"}` : "";
+const fmtDias = iso => {
+  const days = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
+  return days === 0 ? "hoy" : `${days} d`;
+};
+const MESES_ABR = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+const fmtFecha = date => `${date.getDate()} ${MESES_ABR[date.getMonth()]} ${date.getFullYear()}`;
+const fmtHace = iso => {
+  const mins = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 60) return `hace ${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `hace ${hrs} h`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `hace ${days} d`;
+  return `hace ${Math.floor(days / 7)} semana${Math.floor(days / 7) > 1 ? "s" : ""}`;
+};
+
 class Component extends DCLogic {
   state = {
     screen: "resumen", filtro: "Todas", activa: null,
     vista: "login", modo: "Ingresar", plan: "mensual",
-    nombre: "", usuario: "", clave: "", verClave: false, error: false
+    nombre: "", usuario: "", clave: "", verClave: false, error: false,
+    loading: false, authMsg: "",
+    session: null, profile: null,
+    properties: [], clients: [], deals: [], activities: [], matches: []
   };
   mapEl = null;
 
   post(msg) { if (this.mapEl && this.mapEl.contentWindow) this.mapEl.contentWindow.postMessage(msg, "*"); }
+
+  async componentDidMount() {
+    const { data } = await sb.auth.getSession();
+    if (data.session) {
+      this.setState({ session: data.session, vista: "app" });
+      this.loadAll(data.session.user.id);
+    }
+    sb.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        this.setState({ session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: [] });
+      }
+    });
+    window.addEventListener("message", e => {
+      const d = e.data || {};
+      if (d.type === "ready") this.sendPropsToMap();
+    });
+  }
+
+  sendPropsToMap() {
+    const mapProps = (this.state.properties || []).map(p => ({
+      id: p.id, t: p.titulo, z: p.zona, tipo: p.tipo, est: p.estado,
+      p: fmtL(p.precio), lat: p.lat, lng: p.lng
+    })).filter(p => p.lat != null && p.lng != null);
+    this.post({ type: "load", props: mapProps });
+  }
+
+  async loadAll(userId) {
+    this.setState({ loading: true });
+    // Justo tras el login, el JWT recién emitido a veces llega a PostgREST antes de que
+    // su reloj lo considere válido ("JWT issued at future" / PGRST303). Reintenta una vez.
+    const withRetry = async (build) => {
+      let res = await build();
+      if (res.error && res.error.code === "PGRST303") {
+        await new Promise(r => setTimeout(r, 800));
+        res = await build();
+      }
+      return res;
+    };
+    const [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes] = await Promise.all([
+      withRetry(() => sb.from("profiles").select("*").eq("id", userId).single()),
+      withRetry(() => sb.from("properties").select("*").eq("user_id", userId).order("created_at")),
+      withRetry(() => sb.from("clients").select("*").eq("user_id", userId).order("created_at")),
+      withRetry(() => sb.from("deals").select("*, properties(titulo)").eq("user_id", userId).order("fecha_cierre", { ascending: false })),
+      withRetry(() => sb.from("activities").select("*").eq("user_id", userId).order("created_at", { ascending: false })),
+      withRetry(() => sb.from("matches").select("*, clients(nombre), properties(titulo)").eq("user_id", userId))
+    ]);
+    this.setState({
+      loading: false,
+      profile: profileRes.data,
+      plan: (profileRes.data && profileRes.data.plan) || "mensual",
+      properties: propsRes.data || [],
+      clients: clientsRes.data || [],
+      deals: dealsRes.data || [],
+      activities: actsRes.data || [],
+      matches: matchesRes.data || []
+    });
+    this.sendPropsToMap();
+  }
 
   renderVals() {
     const s = this.state.screen;
@@ -418,14 +502,10 @@ class Component extends DCLogic {
       style: `display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px; cursor:pointer; transition:background .15s ease; color:${s === id ? "#101F2B" : "#C9D2DA"}; background:${s === id ? "#F4F0E8" : "transparent"}; font-weight:${s === id ? 600 : 500}`
     }));
 
-    const propsData = [
-      { id: 1, t: "Casa Residencial Los Andes", z: "Col. Los Andes", p: "L. 3,850,000", est: "Disponible", tipo: "Casa", meta: "3 hab · 240 m²" },
-      { id: 2, t: "Apartamento Torre Aria", z: "Lomas del Guijarro", p: "L. 2,150,000", est: "Negociando", tipo: "Apartamento", meta: "2 hab · 96 m²" },
-      { id: 3, t: "Casa Colonia Trejo", z: "Col. Trejo", p: "L. 1,980,000", est: "Disponible", tipo: "Casa", meta: "3 hab · 180 m²" },
-      { id: 4, t: "Local comercial Río de Piedras", z: "Río de Piedras", p: "L. 4,400,000", est: "Vendida", tipo: "Local", meta: "320 m²" },
-      { id: 5, t: "Terreno El Hatillo", z: "El Hatillo", p: "L. 950,000", est: "Disponible", tipo: "Terreno", meta: "1,100 v²" },
-      { id: 6, t: "Apartamento Palmira 402", z: "Col. Palmira", p: "L. 2,650,000", est: "Disponible", tipo: "Apartamento", meta: "2 hab · 110 m²" }
-    ];
+    const propsData = (this.state.properties || []).map(p => ({
+      id: p.id, t: p.titulo, z: p.zona, p: fmtL(p.precio), est: p.estado, tipo: p.tipo,
+      meta: [p.habitaciones ? `${p.habitaciones} hab` : null, fmtArea(p.area, p.area_unidad)].filter(Boolean).join(" · ")
+    }));
     const col = { Disponible: GREEN, Negociando: GOLD, Vendida: RED };
     const f = this.state.filtro;
     const filtros = ["Todas", "Casa", "Apartamento", "Terreno", "Local"].map(label => ({
@@ -460,7 +540,7 @@ class Component extends DCLogic {
       isRegistro: registro,
       authTitle: registro ? "Creá tu cuenta" : "Bienvenido de nuevo",
       authSub: registro ? "14 días gratis, sin cargo hasta el día 15." : "Ingresá con tu usuario y contraseña.",
-      authCta: registro ? "Continuar al pago" : "Entrar a PropTrack",
+      authCta: st.loading ? "Un momento…" : (registro ? "Continuar al pago" : "Entrar a PropTrack"),
       tabs: ["Ingresar", "Registrarme"].map(label => ({
         label, go: () => this.setState({ modo: label, error: false }),
         style: `flex:1; text-align:center; padding:9px; border-radius:99px; font-size:13.5px; font-weight:600; cursor:pointer; background:${st.modo === label ? "#FBF9F5" : "transparent"}; color:${st.modo === label ? "#14212B" : "#6B7480"}`
@@ -474,69 +554,134 @@ class Component extends DCLogic {
       claveLabel: st.verClave ? "OCULTAR" : "VER",
       toggleClave: () => this.setState({ verClave: !st.verClave }),
       mostrarError: st.error,
-      entrar: () => {
+      authMsgText: st.authMsg || "Ingresá usuario y contraseña para continuar.",
+      entrar: async () => {
         if (!st.usuario.trim() || !st.clave.trim()) return this.setState({ error: true });
-        this.setState({ vista: registro ? "pago" : "app", error: false });
+        this.setState({ loading: true, error: false, authMsg: "" });
+        if (registro) {
+          const { data, error } = await sb.auth.signUp({
+            email: st.usuario.trim(), password: st.clave,
+            options: { data: { nombre: st.nombre.trim() || st.usuario.trim() } }
+          });
+          if (error) return this.setState({ loading: false, error: true, authMsg: error.message });
+          if (data.session) {
+            this.setState({ loading: false, session: data.session, vista: "pago" });
+          } else {
+            this.setState({ loading: false, error: true, authMsg: "Cuenta creada. Revisá tu correo para confirmarla y luego iniciá sesión." });
+          }
+        } else {
+          const { data, error } = await sb.auth.signInWithPassword({ email: st.usuario.trim(), password: st.clave });
+          if (error) return this.setState({ loading: false, error: true, authMsg: "Usuario o contraseña incorrectos." });
+          this.setState({ loading: false, session: data.session, vista: "app", clave: "" });
+          this.loadAll(data.session.user.id);
+        }
       },
-      activar: () => this.setState({ vista: "app", screen: "resumen" }),
-      salir: () => this.setState({ vista: "login", modo: "Ingresar", clave: "", error: false }),
+      activar: async () => {
+        const userId = st.session && st.session.user && st.session.user.id;
+        if (userId) await sb.from("profiles").update({ plan: st.plan }).eq("id", userId);
+        this.setState({ vista: "app", screen: "resumen" });
+        if (userId) this.loadAll(userId);
+      },
+      salir: async () => {
+        await sb.auth.signOut();
+        this.setState({
+          vista: "login", modo: "Ingresar", clave: "", error: false, authMsg: "",
+          session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: []
+        });
+      },
       planes, planNombre: planActual.nombre, planPrecio: planActual.precio, planPeriodo: planActual.periodo,
-      nombreCuenta: st.nombre.trim() || "Dariel Mencía"
+      nombreCuenta: (st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel Mencía",
+      fechaPrueba: fmtFecha(new Date(Date.now() + 14 * 86400000))
     };
+
+    const clientsData = this.state.clients || [];
+    const dealsData = this.state.deals || [];
+    const activitiesData = this.state.activities || [];
+    const matchesData = this.state.matches || [];
+
+    const leadsNuevos = clientsData.filter(c => c.etapa === "Contacto").length;
+    const enNegociacion = clientsData.filter(c => c.etapa === "Negociando").length;
+    const tasaPromedio = dealsData.length
+      ? dealsData.reduce((sum, d) => sum + (d.valor ? d.comision / d.valor : 0), 0) / dealsData.length
+      : 0;
+    const cobrado = dealsData.reduce((sum, d) => sum + Number(d.comision || 0), 0);
+    const presupuestoNegociando = clientsData.filter(c => c.etapa === "Negociando").reduce((sum, c) => sum + Number(c.presupuesto || 0), 0);
+    const proyectado = presupuestoNegociando * tasaPromedio;
+
+    const metaObjetivoNum = (this.state.profile && this.state.profile.meta_mensual) || 120000;
+    const metaPct = metaObjetivoNum ? Math.min(100, Math.round((cobrado / metaObjetivoNum) * 100)) : 0;
+
+    const kpis = [
+      { icon: "⌂", value: String(propsData.length), label: "Propiedades activas", delta: "" },
+      { icon: "◍", value: String(leadsNuevos), label: "Leads nuevos", delta: "" },
+      { icon: "↗", value: String(enNegociacion), label: "En negociación", delta: "" },
+      { icon: "▤", value: fmtL(proyectado), label: "Comisión proyectada", delta: "" }
+    ];
+
+    const matches = matchesData.map(m => ({
+      cliente: (m.clients && m.clients.nombre) || "",
+      prop: (m.properties && m.properties.titulo) || "",
+      score: `${m.score}%`, pct: m.score,
+      barStyle: `width:${m.score}%; height:100%; background:${GOLD}; border-radius:99px`
+    }));
+
+    const feed = activitiesData.map(a => ({
+      text: a.texto, when: fmtHace(a.created_at),
+      dotStyle: `width:7px; height:7px; border-radius:50%; background:${a.tipo === "success" ? GREEN : a.tipo === "warning" ? RED : GOLD}; margin-top:6px; flex:none`
+    }));
+
+    const comKpis = [
+      { label: "COBRADO 2026", value: fmtL(cobrado) },
+      { label: "PROYECTADO", value: fmtL(proyectado) },
+      { label: "TASA PROMEDIO", value: `${(tasaPromedio * 100).toFixed(1)}%` }
+    ];
+
+    const porMes = {};
+    dealsData.forEach(d => {
+      const dt = new Date(d.fecha_cierre);
+      const key = `${dt.getFullYear()}-${dt.getMonth()}`;
+      porMes[key] = (porMes[key] || 0) + Number(d.comision || 0);
+    });
+    const mesesOrdenados = Object.keys(porMes).sort();
+    const maxMes = Math.max(1, ...Object.values(porMes));
+    const bars = mesesOrdenados.map(key => {
+      const [, mi] = key.split("-").map(Number);
+      const v = Math.round((porMes[key] / maxMes) * 100);
+      return { m: MESES_ABR[mi], style: `width:100%; height:${v}%; border-radius:7px 7px 3px 3px; background:${v >= 90 ? GOLD : "#CFC6B3"}` };
+    });
+
+    const rows = dealsData.map(d => ({
+      op: (d.properties && d.properties.titulo) || d.cliente_nombre,
+      cli: d.cliente_nombre, val: fmtL(d.valor), com: fmtL(d.comision)
+    }));
 
     return {
       ...auth,
       nav, filtros, propsList,
+      propsCount: `${propsData.length} activas`,
+      fechaHoy: fmtFecha(new Date()),
+      saludo: `Buen día, ${((st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel").split(" ")[0]}`,
       title: { resumen: "Resumen", props: "Propiedades", clientes: "Clientes", comisiones: "Comisiones" }[s],
       isResumen: s === "resumen", isProps: s === "props", isClientes: s === "clientes", isComisiones: s === "comisiones",
       goClientes: () => this.setState({ screen: "clientes" }),
       mapRef: el => { this.mapEl = el; },
-      kpis: [
-        { icon: "⌂", value: "6", label: "Propiedades activas", delta: "" },
-        { icon: "◍", value: "2", label: "Leads nuevos", delta: "+2 semana" },
-        { icon: "↗", value: "1", label: "En negociación", delta: "" },
-        { icon: "▤", value: "L. 85.5k", label: "Comisión proyectada", delta: "+12%" }
-      ],
-      matches: [
-        { cliente: "Roberto Paz", prop: "Casa Colonia Trejo", score: "94%", pct: 94 },
-        { cliente: "Carlos Mejía", prop: "Casa Residencial Los Andes", score: "86%", pct: 86 },
-        { cliente: "Ana Cruz", prop: "Apartamento Torre Aria", score: "78%", pct: 78 }
-      ].map(m => ({ ...m, barStyle: `width:${m.pct}%; height:100%; background:${GOLD}; border-radius:99px` })),
-      feed: [
-        { text: "Roberto Paz visitó Casa Colonia Trejo", when: "hace 2 h", c: GREEN },
-        { text: "Nuevo lead: Daysi Ramírez, interesada en Zona Viva", when: "hace 3 h", c: GOLD },
-        { text: "Recordatorio de pago enviado a 2 clientes", when: "hace 5 h", c: GOLD },
-        { text: "Local Río de Piedras marcado como vendido", when: "hace 1 semana", c: RED }
-      ].map(x => ({ ...x, dotStyle: `width:7px; height:7px; border-radius:50%; background:${x.c}; margin-top:6px; flex:none` })),
+      kpis, matches, feed,
+      metaCobrado: fmtL(cobrado), metaObjetivo: Math.round(metaObjetivoNum).toLocaleString("en-US"),
+      metaBarStyle: `width:${metaPct}%; height:100%; background:#C08A3E; border-radius:99px`,
       leyenda: [
         { label: "Disponible", c: GREEN }, { label: "Negociando", c: GOLD }, { label: "Vendida", c: RED }
       ].map(l => ({ ...l, dot: `width:9px; height:9px; border-radius:50%; background:${l.c}; display:inline-block` })),
-      pipeline: [
-        { label: "Contacto", n: "2", cards: [
-          { n: "Daysi Ramírez", busca: "Apartamento en Zona Viva", pres: "L. 2.0M", dias: "3 d" },
-          { n: "Luis Fajardo", busca: "Terreno en El Hatillo", pres: "L. 900k", dias: "5 d" }] },
-        { label: "Visita", n: "2", cards: [
-          { n: "Carlos Mejía", busca: "Casa 3 hab, Los Andes", pres: "L. 3.9M", dias: "8 d" },
-          { n: "Ana Cruz", busca: "Apartamento amueblado", pres: "L. 2.2M", dias: "11 d" }] },
-        { label: "Negociando", n: "1", cards: [
-          { n: "Roberto Paz", busca: "Casa Colonia Trejo", pres: "L. 1.9M", dias: "18 d" }] },
-        { label: "Cerrado", n: "1", cards: [
-          { n: "Inversiones RG", busca: "Local Río de Piedras", pres: "L. 4.4M", dias: "cerrado" }] }
-      ],
-      comKpis: [
-        { label: "COBRADO 2026", value: "L. 268,000" },
-        { label: "PROYECTADO", value: "L. 85,500" },
-        { label: "TASA PROMEDIO", value: "4.2%" }
-      ],
-      bars: [
-        ["ENE", 30], ["FEB", 55], ["MAR", 40], ["ABR", 78], ["MAY", 62], ["JUN", 95], ["JUL", 70], ["AGO", 48]
-      ].map(([m, v]) => ({ m, style: `width:100%; height:${v}%; border-radius:7px 7px 3px 3px; background:${v >= 90 ? GOLD : "#CFC6B3"}` })),
-      rows: [
-        { op: "Local comercial Río de Piedras", cli: "Inversiones RG", val: "L. 4,400,000", com: "L. 176,000" },
-        { op: "Casa Lomas del Mayab", cli: "Familia Zelaya", val: "L. 2,300,000", com: "L. 92,000" },
-        { op: "Apartamento Torre Aria", cli: "Ana Cruz", val: "L. 2,150,000", com: "L. 86,000" },
-        { op: "Terreno Valle de Ángeles", cli: "M. Discua", val: "L. 780,000", com: "L. 31,200" }
-      ]
+      pipeline: ["Contacto", "Visita", "Negociando", "Cerrado"].map(etapa => {
+        const cards = (this.state.clients || [])
+          .filter(c => c.etapa === etapa)
+          .map(c => ({
+            n: c.nombre, busca: c.busca || "",
+            pres: fmtL(c.presupuesto),
+            dias: etapa === "Cerrado" ? "cerrado" : fmtDias(c.created_at)
+          }));
+        return { label: etapa, n: String(cards.length), cards };
+      }),
+      comKpis, bars, rows
     };
   }
 }
