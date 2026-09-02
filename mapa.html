@@ -34,12 +34,18 @@
 <div id="map"></div>
 <script>
 const color = { Disponible:"#3E7C6B", Negociando:"#C08A3E", Vendida:"#B4553C" };
-const DEFAULT_CENTER = [14.0975,-87.1985];
+const DEFAULT_CENTER = [15.5041,-88.0250]; // San Pedro Sula
+const DEFAULT_ZOOM = 13;
 
-const map = L.map('map', { zoomControl:true, scrollWheelZoom:true }).setView(DEFAULT_CENTER, 13);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+const map = L.map('map', { zoomControl:true, scrollWheelZoom:true }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+
+const calles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors', maxZoom: 19
 }).addTo(map);
+const satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles © Esri', maxZoom: 19
+});
+L.control.layers({ 'Calles': calles, 'Satélite': satelite }, null, { position: 'topright' }).addTo(map);
 
 let markers = {};
 
@@ -53,6 +59,13 @@ function renderProps(props) {
     m.bindPopup(`<div class="pop-t">${p.t}</div><div class="pop-s">${p.tipo} · ${p.z} · ${p.est}</div><div class="pop-p">${p.p}</div>`);
     markers[p.id] = m;
   });
+  // Nivel nacional: encuadra automáticamente todas las propiedades reales, sin importar la ciudad.
+  const withCoords = Object.values(markers);
+  if (withCoords.length) {
+    map.fitBounds(L.featureGroup(withCoords).getBounds().pad(0.25), { maxZoom: 15 });
+  } else {
+    map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+  }
 }
 
 window.addEventListener('message', e => {

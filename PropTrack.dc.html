@@ -63,7 +63,7 @@
 
           <label style="display:flex; flex-direction:column; gap:7px">
             <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#6B7480">USUARIO O CORREO</span>
-            <input value="{{ usuario }}" onChange="{{ setUsuario }}" placeholder="dariel@correo.com" style="border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 14px; font-family:'Work Sans', sans-serif; font-size:14px; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
+            <input value="{{ usuario }}" onChange="{{ setUsuario }}" placeholder="Ingresá tu usuario" style="border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 14px; font-family:'Work Sans', sans-serif; font-size:14px; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
           </label>
 
           <label style="display:flex; flex-direction:column; gap:7px">
@@ -202,7 +202,7 @@
       <div style="display:flex; align-items:center; gap:18px">
         <div style="display:flex; align-items:center; background:#EFEAE0; border-radius:99px; padding:8px 16px; gap:9px; min-width:250px">
           <span style="opacity:.45; font-size:13px">⌕</span>
-          <input placeholder="Buscar propiedad, cliente o zona" style="border:none; background:transparent; outline:none; font-family:'Work Sans', sans-serif; font-size:13px; width:100%; color:#14212B">
+          <input value="{{ busqueda }}" onChange="{{ setBusqueda }}" placeholder="Buscar propiedad, cliente o zona" style="border:none; background:transparent; outline:none; font-family:'Work Sans', sans-serif; font-size:13px; width:100%; color:#14212B">
         </div>
         <span style="font-family:'JetBrains Mono', monospace; font-size:11.5px; color:#6B7480">{{ fechaHoy }}</span>
       </div>
@@ -403,7 +403,15 @@ const SUPABASE_ANON_KEY = "sb_publishable_q-tkFGZQimwEJzsaMXYihA_igJZXd5k";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const fmtL = n => "L. " + Math.round(Number(n) || 0).toLocaleString("en-US");
-const fmtArea = (area, unidad) => area ? `${Number(area).toLocaleString("en-US")} ${unidad === "v2" ? "v²" : "m²"}` : "";
+const VARA2_A_M2 = 0.6987; // 1 vara² hondureña ≈ 0.6987 m²
+const fmtArea = (area, unidad) => {
+  if (!area) return "";
+  if (unidad === "v2") {
+    const m2 = Math.round(area * VARA2_A_M2);
+    return `${Number(area).toLocaleString("en-US")} v² (≈ ${m2.toLocaleString("en-US")} m²)`;
+  }
+  return `${Number(area).toLocaleString("en-US")} m²`;
+};
 const fmtDias = iso => {
   const days = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
   return days === 0 ? "hoy" : `${days} d`;
@@ -425,7 +433,7 @@ class Component extends DCLogic {
     screen: "resumen", filtro: "Todas", activa: null,
     vista: "login", modo: "Ingresar", plan: "mensual",
     nombre: "", usuario: "", clave: "", verClave: false, error: false,
-    loading: false, authMsg: "",
+    loading: false, authMsg: "", busqueda: "",
     session: null, profile: null,
     properties: [], clients: [], deals: [], activities: [], matches: []
   };
@@ -513,7 +521,8 @@ class Component extends DCLogic {
       style: `font-family:'JetBrains Mono', monospace; font-size:11px; padding:7px 13px; border-radius:99px; cursor:pointer; border:1px solid ${f === label ? "#101F2B" : "rgba(20,33,43,.16)"}; background:${f === label ? "#101F2B" : "transparent"}; color:${f === label ? "#F4F0E8" : "#5E6771"}`
     }));
 
-    const propsList = propsData.filter(p => f === "Todas" || p.tipo === f).map(p => ({
+    const q = (this.state.busqueda || "").trim().toLowerCase();
+    const propsList = propsData.filter(p => (f === "Todas" || p.tipo === f) && (!q || p.t.toLowerCase().includes(q) || (p.z || "").toLowerCase().includes(q))).map(p => ({
       ...p,
       go: () => { this.setState({ activa: p.id }); this.post({ type: "focus", id: p.id }); },
       cardStyle: `background:#FBF9F5; border:1px solid ${this.state.activa === p.id ? "rgba(192,138,62,.75)" : "rgba(20,33,43,.08)"}; border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s ease`,
@@ -570,7 +579,15 @@ class Component extends DCLogic {
             this.setState({ loading: false, error: true, authMsg: "Cuenta creada. Revisá tu correo para confirmarla y luego iniciá sesión." });
           }
         } else {
-          const { data, error } = await sb.auth.signInWithPassword({ email: st.usuario.trim(), password: st.clave });
+          const email = st.usuario.trim();
+          const { data: exists, error: checkErr } = await sb.rpc("email_exists", { p_email: email });
+          if (!checkErr && exists === false) {
+            return this.setState({
+              loading: false, error: true, modo: "Registrarme",
+              authMsg: "Ese usuario no está registrado. Por favor registrate para poder continuar."
+            });
+          }
+          const { data, error } = await sb.auth.signInWithPassword({ email, password: st.clave });
           if (error) return this.setState({ loading: false, error: true, authMsg: "Usuario o contraseña incorrectos." });
           this.setState({ loading: false, session: data.session, vista: "app", clave: "" });
           this.loadAll(data.session.user.id);
@@ -671,9 +688,12 @@ class Component extends DCLogic {
       leyenda: [
         { label: "Disponible", c: GREEN }, { label: "Negociando", c: GOLD }, { label: "Vendida", c: RED }
       ].map(l => ({ ...l, dot: `width:9px; height:9px; border-radius:50%; background:${l.c}; display:inline-block` })),
+      busqueda: st.busqueda,
+      setBusqueda: e => this.setState({ busqueda: e.target.value }),
       pipeline: ["Contacto", "Visita", "Negociando", "Cerrado"].map(etapa => {
         const cards = (this.state.clients || [])
           .filter(c => c.etapa === etapa)
+          .filter(c => !q || c.nombre.toLowerCase().includes(q) || (c.busca || "").toLowerCase().includes(q))
           .map(c => ({
             n: c.nombre, busca: c.busca || "",
             pres: fmtL(c.presupuesto),
