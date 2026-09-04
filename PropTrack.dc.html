@@ -564,6 +564,29 @@ const fmtHace = iso => {
   return `hace ${Math.floor(days / 7)} semana${Math.floor(days / 7) > 1 ? "s" : ""}`;
 };
 
+// Cache local (stale-while-revalidate): al abrir la app se pinta al instante
+// lo último que se cargó para este usuario, mientras loadAll() revalida con
+// Supabase en segundo plano y reemplaza el estado cuando llega lo fresco.
+const CACHE_VERSION = "v1";
+const cacheKey = userId => `proptrack_cache_${CACHE_VERSION}_${userId}`;
+const CACHE_FIELDS = ["profile", "plan", "properties", "clients", "deals", "activities", "matches", "kpiRow", "mesesRow"];
+const saveCache = (userId, data) => {
+  try {
+    const snapshot = {};
+    CACHE_FIELDS.forEach(k => { snapshot[k] = data[k]; });
+    localStorage.setItem(cacheKey(userId), JSON.stringify({ savedAt: Date.now(), ...snapshot }));
+  } catch (e) { /* localStorage no disponible (privado, cuota, etc.) — se ignora */ }
+};
+const loadCache = userId => {
+  try {
+    const raw = localStorage.getItem(cacheKey(userId));
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+};
+const clearCache = userId => {
+  try { localStorage.removeItem(cacheKey(userId)); } catch (e) { /* nada que limpiar */ }
+};
+
 class Component extends DCLogic {
   state = {
     screen: "resumen", filtro: "Todas", activa: null,
@@ -571,7 +594,7 @@ class Component extends DCLogic {
     nombre: "", usuario: "", clave: "", verClave: false, error: false,
     loading: false, authMsg: "", busqueda: "", loadError: false,
     session: null, profile: null,
-    properties: [], clients: [], deals: [], activities: [], matches: [],
+    properties: [], clients: [], deals: [], activities: [], matches: [], kpiRow: null, mesesRow: [],
     showAddProp: false, savingProp: false, npError: "",
     npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
     npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: "",
@@ -585,12 +608,14 @@ class Component extends DCLogic {
   async componentDidMount() {
     const { data } = await sb.auth.getSession();
     if (data.session) {
-      this.setState({ session: data.session, vista: "app" });
-      this.loadAll(data.session.user.id);
+      const userId = data.session.user.id;
+      const cached = loadCache(userId);
+      this.setState({ session: data.session, vista: "app", ...(cached || {}) });
+      this.loadAll(userId); // revalida en segundo plano aunque haya cache
     }
     sb.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
-        this.setState({ session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: [] });
+        this.setState({ session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: [], kpiRow: null, mesesRow: [] });
       }
     });
     window.addEventListener("message", e => {
@@ -629,26 +654,30 @@ class Component extends DCLogic {
       if (res.error) console.error("PropTrack: fallo cargando " + tag, res.error);
       return res;
     };
-    const [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes] = await Promise.all([
+    const [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes, kpiRes, mesesRes] = await Promise.all([
       withRetry(sig => sb.from("profiles").select("*").eq("id", userId).abortSignal(sig).maybeSingle(), "profiles"),
       withRetry(sig => sb.from("properties").select("*").eq("user_id", userId).abortSignal(sig).order("created_at"), "properties"),
       withRetry(sig => sb.from("clients").select("*").eq("user_id", userId).abortSignal(sig).order("created_at"), "clients"),
       withRetry(sig => sb.from("deals").select("*, properties(titulo)").eq("user_id", userId).abortSignal(sig).order("fecha_cierre", { ascending: false }), "deals"),
       withRetry(sig => sb.from("activities").select("*").eq("user_id", userId).abortSignal(sig).order("created_at", { ascending: false }), "activities"),
-      withRetry(sig => sb.from("matches").select("*, clients(nombre), properties(titulo)").eq("user_id", userId).abortSignal(sig), "matches")
+      withRetry(sig => sb.from("matches").select("*, clients(nombre), properties(titulo)").eq("user_id", userId).abortSignal(sig), "matches"),
+      withRetry(sig => sb.from("v_dashboard_kpis").select("*").eq("user_id", userId).abortSignal(sig).maybeSingle(), "kpis"),
+      withRetry(sig => sb.from("v_comisiones_por_mes").select("*").eq("user_id", userId).abortSignal(sig).order("mes"), "kpis_mensuales")
     ]);
-    const anyError = [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes].some(r => r.error);
-    this.setState({
-      loading: false,
-      loadError: anyError,
+    const anyError = [profileRes, propsRes, clientsRes, dealsRes, actsRes, matchesRes, kpiRes, mesesRes].some(r => r.error);
+    const freshData = {
       profile: profileRes.data,
       plan: (profileRes.data && profileRes.data.plan) || "mensual",
       properties: propsRes.data || [],
       clients: clientsRes.data || [],
       deals: dealsRes.data || [],
       activities: actsRes.data || [],
-      matches: matchesRes.data || []
-    });
+      matches: matchesRes.data || [],
+      kpiRow: kpiRes.data || null,
+      mesesRow: mesesRes.data || []
+    };
+    this.setState({ loading: false, loadError: anyError, ...freshData });
+    if (!anyError) saveCache(userId, freshData);
     this.sendPropsToMap();
   }
 
@@ -808,10 +837,12 @@ class Component extends DCLogic {
         if (userId) this.loadAll(userId);
       },
       salir: async () => {
+        const userId = st.session && st.session.user && st.session.user.id;
         await sb.auth.signOut();
+        if (userId) clearCache(userId);
         this.setState({
           vista: "login", modo: "Ingresar", clave: "", error: false, authMsg: "",
-          session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: []
+          session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: [], kpiRow: null, mesesRow: []
         });
       },
       planes, planNombre: planActual.nombre, planPrecio: planActual.precio, planPeriodo: planActual.periodo,
@@ -819,25 +850,25 @@ class Component extends DCLogic {
       fechaPrueba: fmtFecha(new Date(Date.now() + 14 * 86400000))
     };
 
-    const clientsData = this.state.clients || [];
     const dealsData = this.state.deals || [];
     const activitiesData = this.state.activities || [];
     const matchesData = this.state.matches || [];
 
-    const leadsNuevos = clientsData.filter(c => c.etapa === "Contacto").length;
-    const enNegociacion = clientsData.filter(c => c.etapa === "Negociando").length;
-    const tasaPromedio = dealsData.length
-      ? dealsData.reduce((sum, d) => sum + (d.valor ? d.comision / d.valor : 0), 0) / dealsData.length
-      : 0;
-    const cobrado = dealsData.reduce((sum, d) => sum + Number(d.comision || 0), 0);
-    const presupuestoNegociando = clientsData.filter(c => c.etapa === "Negociando").reduce((sum, c) => sum + Number(c.presupuesto || 0), 0);
-    const proyectado = presupuestoNegociando * tasaPromedio;
+    // Los KPIs vienen de la vista public.v_dashboard_kpis (idempotente: create or
+    // replace view), no se recalculan aquí — una sola fuente de verdad en la BD.
+    const kpiRow = this.state.kpiRow || {};
+    const propiedadesActivas = Number(kpiRow.propiedades_activas || 0);
+    const leadsNuevos = Number(kpiRow.leads_nuevos || 0);
+    const enNegociacion = Number(kpiRow.en_negociacion || 0);
+    const tasaPromedio = Number(kpiRow.tasa_promedio || 0);
+    const cobrado = Number(kpiRow.cobrado || 0);
+    const proyectado = Number(kpiRow.comision_proyectada || 0);
 
-    const metaObjetivoNum = (this.state.profile && this.state.profile.meta_mensual) || 120000;
+    const metaObjetivoNum = Number(kpiRow.meta_mensual || (this.state.profile && this.state.profile.meta_mensual) || 120000);
     const metaPct = metaObjetivoNum ? Math.min(100, Math.round((cobrado / metaObjetivoNum) * 100)) : 0;
 
     const kpis = [
-      { icon: "⌂", value: String(propsData.length), label: "Propiedades activas", delta: "" },
+      { icon: "⌂", value: String(propiedadesActivas), label: "Propiedades activas", delta: "" },
       { icon: "◍", value: String(leadsNuevos), label: "Leads nuevos", delta: "" },
       { icon: "↗", value: String(enNegociacion), label: "En negociación", delta: "" },
       { icon: "▤", value: fmtL(proyectado), label: "Comisión proyectada", delta: "" }
@@ -861,18 +892,11 @@ class Component extends DCLogic {
       { label: "TASA PROMEDIO", value: `${(tasaPromedio * 100).toFixed(1)}%` }
     ];
 
-    const porMes = {};
-    dealsData.forEach(d => {
-      const dt = new Date(d.fecha_cierre);
-      const key = `${dt.getFullYear()}-${dt.getMonth()}`;
-      porMes[key] = (porMes[key] || 0) + Number(d.comision || 0);
-    });
-    const mesesOrdenados = Object.keys(porMes).sort();
-    const maxMes = Math.max(1, ...Object.values(porMes));
-    const bars = mesesOrdenados.map(key => {
-      const [, mi] = key.split("-").map(Number);
-      const v = Math.round((porMes[key] / maxMes) * 100);
-      return { m: MESES_ABR[mi], style: `width:100%; height:${v}%; border-radius:7px 7px 3px 3px; background:${v >= 90 ? GOLD : "#CFC6B3"}` };
+    const mesesRow = this.state.mesesRow || [];
+    const maxMes = Math.max(1, ...mesesRow.map(r => Number(r.total_comision || 0)));
+    const bars = mesesRow.map(r => {
+      const v = Math.round((Number(r.total_comision || 0) / maxMes) * 100);
+      return { m: MESES_ABR[new Date(r.mes).getUTCMonth()], style: `width:100%; height:${v}%; border-radius:7px 7px 3px 3px; background:${v >= 90 ? GOLD : "#CFC6B3"}` };
     });
 
     const rows = dealsData.map(d => ({

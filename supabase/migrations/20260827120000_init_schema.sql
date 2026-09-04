@@ -1,9 +1,6 @@
--- PropTrack — schema, RLS y datos demo
--- Ejecutado directamente contra Supabase (Postgres). Ver README.md para cómo re-ejecutarlo.
-
--- =========================================================
--- TABLAS
--- =========================================================
+-- Esquema base de PropTrack: tablas, RLS y el trigger que crea el
+-- profile automáticamente al registrarse. Idempotente: se puede
+-- correr las veces que sea necesario sin duplicar ni fallar.
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -24,13 +21,10 @@ create table if not exists public.properties (
   habitaciones int,
   area numeric,
   area_unidad text check (area_unidad in ('m2','v2')),
-  descripcion text,
   lat double precision,
   lng double precision,
   created_at timestamptz not null default now()
 );
-
-alter table public.properties add column if not exists descripcion text;
 
 create table if not exists public.clients (
   id uuid primary key default gen_random_uuid(),
@@ -72,10 +66,7 @@ create table if not exists public.matches (
   created_at timestamptz not null default now()
 );
 
--- =========================================================
 -- RLS: cada usuario solo ve/edita su propia cartera
--- =========================================================
-
 alter table public.profiles enable row level security;
 alter table public.properties enable row level security;
 alter table public.clients enable row level security;
@@ -107,15 +98,13 @@ drop policy if exists matches_own on public.matches;
 create policy matches_own on public.matches
   for all using (user_id = auth.uid()) with check (user_id = auth.uid());
 
--- =========================================================
 -- Trigger: crea el profile automáticamente al registrarse
--- =========================================================
-
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.profiles (id, nombre)
-  values (new.id, coalesce(new.raw_user_meta_data->>'nombre', split_part(new.email, '@', 1)));
+  values (new.id, coalesce(new.raw_user_meta_data->>'nombre', split_part(new.email, '@', 1)))
+  on conflict (id) do nothing;
   return new;
 end;
 $$ language plpgsql security definer set search_path = public;
@@ -124,23 +113,3 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
-
--- =========================================================
--- RPC: verifica si un correo ya está registrado (solo boolean,
--- no expone más datos) — se usa en el login para distinguir
--- "no tenés cuenta, registrate" de "contraseña incorrecta".
--- =========================================================
-
-create or replace function public.email_exists(p_email text)
-returns boolean
-language sql
-security definer
-set search_path = public, auth
-as $$
-  select exists (
-    select 1 from auth.users where lower(email) = lower(p_email)
-  );
-$$;
-
-revoke all on function public.email_exists(text) from public;
-grant execute on function public.email_exists(text) to anon, authenticated;
