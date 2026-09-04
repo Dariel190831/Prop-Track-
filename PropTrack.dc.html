@@ -78,7 +78,7 @@
             <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:10px; padding:10px 13px; font-size:12.5px; color:#8E3E29">{{ authMsgText }}</div>
           </sc-if>
 
-          <div onClick="{{ entrar }}" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:4px" style-hover="background:#1B3040">{{ authCta }}</div>
+          <div onClick="{{ entrar }}" style="{{ authCtaStyle }}" style-hover="background:#1B3040">{{ authCta }}</div>
 
           <div style="display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:#6B7480">
             <span style="cursor:pointer" style-hover="color:#8A5E1F">¿Olvidaste tu contraseña?</span>
@@ -479,7 +479,7 @@
             </sc-if>
             <div style="display:flex; gap:10px; margin-top:8px">
               <div onClick="{{ cerrarNuevaProp }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
-              <div onClick="{{ guardarNuevaProp }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">{{ npGuardarLabel }}</div>
+              <div onClick="{{ guardarNuevaProp }}" style="{{ npGuardarStyle }}" style-hover="background:#1B3040">{{ npGuardarLabel }}</div>
             </div>
           </div>
         </div>
@@ -519,7 +519,7 @@
             </sc-if>
             <div style="display:flex; gap:10px; margin-top:8px">
               <div onClick="{{ cerrarNuevoCliente }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
-              <div onClick="{{ guardarNuevoCliente }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">{{ ncGuardarLabel }}</div>
+              <div onClick="{{ guardarNuevoCliente }}" style="{{ ncGuardarStyle }}" style-hover="background:#1B3040">{{ ncGuardarLabel }}</div>
             </div>
           </div>
         </div>
@@ -683,6 +683,7 @@ class Component extends DCLogic {
 
   async guardarNuevaProp() {
     const s = this.state;
+    if (s.savingProp) return; // evita doble clic / doble submit -> filas duplicadas
     const userId = s.session && s.session.user && s.session.user.id;
     if (!userId) return;
     if (!s.npTitulo.trim() || !s.npZona.trim() || !s.npPrecio) {
@@ -714,6 +715,7 @@ class Component extends DCLogic {
 
   async guardarNuevoCliente() {
     const s = this.state;
+    if (s.savingClient) return; // evita doble clic / doble submit -> filas duplicadas
     const userId = s.session && s.session.user && s.session.user.id;
     if (!userId) return;
     if (!s.ncNombre.trim()) return this.setState({ ncError: "Ingresá el nombre del cliente." });
@@ -787,6 +789,7 @@ class Component extends DCLogic {
       authTitle: registro ? "Creá tu cuenta" : "Bienvenido de nuevo",
       authSub: registro ? "14 días gratis, sin cargo hasta el día 15." : "Ingresá con tu usuario y contraseña.",
       authCta: st.loading ? "Un momento…" : (registro ? "Continuar al pago" : "Entrar a PropTrack"),
+      authCtaStyle: `background:#101F2B; color:#F4F0E8; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; margin-top:4px; ${st.loading ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
       tabs: ["Ingresar", "Registrarme"].map(label => ({
         label, go: () => this.setState({ modo: label, error: false }),
         style: `flex:1; text-align:center; padding:9px; border-radius:99px; font-size:13.5px; font-weight:600; cursor:pointer; background:${st.modo === label ? "#FBF9F5" : "transparent"}; color:${st.modo === label ? "#14212B" : "#6B7480"}`
@@ -802,6 +805,7 @@ class Component extends DCLogic {
       mostrarError: st.error,
       authMsgText: st.authMsg || "Ingresá usuario y contraseña para continuar.",
       entrar: async () => {
+        if (st.loading) return; // evita doble clic mientras ya hay un intento en curso
         if (!st.usuario.trim() || !st.clave.trim()) return this.setState({ error: true });
         this.setState({ loading: true, error: false, authMsg: "" });
         if (registro) {
@@ -941,6 +945,7 @@ class Component extends DCLogic {
       abrirNuevaProp: () => this.setState({ showAddProp: true, npError: "" }),
       cerrarNuevaProp: () => this.setState({ showAddProp: false, npError: "" }),
       npGuardarLabel: st.savingProp ? "Guardando…" : "Guardar propiedad",
+      npGuardarStyle: `flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; ${st.savingProp ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
       npError: st.npError,
       npTitulo: st.npTitulo, setNpTitulo: e => this.setState({ npTitulo: e.target.value }),
       npZona: st.npZona, setNpZona: e => this.setState({ npZona: e.target.value }),
@@ -959,6 +964,7 @@ class Component extends DCLogic {
       abrirNuevoCliente: () => this.setState({ showAddClient: true, ncError: "" }),
       cerrarNuevoCliente: () => this.setState({ showAddClient: false, ncError: "" }),
       ncGuardarLabel: st.savingClient ? "Guardando…" : "Guardar cliente",
+      ncGuardarStyle: `flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; ${st.savingClient ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
       ncError: st.ncError,
       ncNombre: st.ncNombre, setNcNombre: e => this.setState({ ncNombre: e.target.value }),
       ncBusca: st.ncBusca, setNcBusca: e => this.setState({ ncBusca: e.target.value }),
