@@ -14,10 +14,11 @@ La aplicación React se sirve en la raíz. El prototipo original está disponibl
 ## Base de datos (Supabase)
 
 El esquema vive en `supabase/migrations/`, un archivo `.sql` por cambio,
-nombrados `AAAAMMDDHHMMSS_descripcion.sql` para que se apliquen en orden.
-Cada script es idempotente (`create table if not exists`, `create or
-replace view/function`, `drop policy if exists` + `create policy`, etc.),
-así que correrlos de nuevo no duplica ni rompe nada.
+numerados `001_descripcion.sql`, `002_descripcion.sql`, etc. para que se
+apliquen en ese orden. Cada script es idempotente (`create table if not
+exists`, `create or replace view/function`, `drop policy if exists` +
+`create policy`, etc.), así que correrlos de nuevo no duplica ni rompe
+nada. La próxima migración se llama `005_...sql`.
 
 ```bash
 DATABASE_URL="postgresql://...pooler.supabase.com:5432/postgres" npm run migrate
