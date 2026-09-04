@@ -202,7 +202,7 @@
       <div style="display:flex; align-items:center; gap:18px">
         <div style="display:flex; align-items:center; background:#EFEAE0; border-radius:99px; padding:8px 16px; gap:9px; min-width:250px">
           <span style="opacity:.45; font-size:13px">⌕</span>
-          <input value="{{ busqueda }}" onChange="{{ setBusqueda }}" placeholder="Buscar propiedad, cliente o zona" style="border:none; background:transparent; outline:none; font-family:'Work Sans', sans-serif; font-size:13px; width:100%; color:#14212B">
+          <input value="{{ busqueda }}" onChange="{{ setBusqueda }}" onKeyDown="{{ onBusquedaKeyDown }}" placeholder="Buscar propiedad, cliente o zona (Enter)" style="border:none; background:transparent; outline:none; font-family:'Work Sans', sans-serif; font-size:13px; width:100%; color:#14212B">
         </div>
         <span style="font-family:'JetBrains Mono', monospace; font-size:11.5px; color:#6B7480">{{ fechaHoy }}</span>
       </div>
@@ -300,7 +300,10 @@
                   <div style="flex:1; min-width:0">
                     <div style="display:flex; justify-content:space-between; gap:8px; align-items:flex-start">
                       <div style="font-size:14.5px; font-weight:600; line-height:1.3">{{ p.t }}</div>
-                      <span style="{{ p.badge }}">{{ p.est }}</span>
+                      <div style="display:flex; align-items:center; gap:6px; flex:none">
+                        <span style="{{ p.badge }}">{{ p.est }}</span>
+                        <span onClick="{{ p.editar }}" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
+                      </div>
                     </div>
                     <div style="font-size:12.5px; color:#6B7480; margin-top:4px">{{ p.z }}</div>
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px">
@@ -409,7 +412,7 @@
     <sc-if value="{{ showAddProp }}" hint-placeholder-val="{{ false }}">
       <div style="position:fixed; inset:0; background:rgba(16,31,43,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:24px">
         <div style="background:#FBF9F5; border-radius:18px; padding:28px 30px; width:100%; max-width:460px; max-height:90vh; overflow:auto; box-shadow:0 20px 60px rgba(20,33,43,.3)">
-          <div style="font-family:'Newsreader', serif; font-size:21px; font-weight:600">Nueva propiedad</div>
+          <div style="font-family:'Newsreader', serif; font-size:21px; font-weight:600">{{ npModalTitle }}</div>
           <div style="display:flex; flex-direction:column; gap:12px; margin-top:18px">
             <label style="display:flex; flex-direction:column; gap:6px">
               <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">TÍTULO</span>
@@ -595,7 +598,7 @@ class Component extends DCLogic {
     loading: false, authMsg: "", busqueda: "", loadError: false,
     session: null, profile: null,
     properties: [], clients: [], deals: [], activities: [], matches: [], kpiRow: null, mesesRow: [],
-    showAddProp: false, savingProp: false, npError: "",
+    showAddProp: false, savingProp: false, npError: "", npEditId: null,
     npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
     npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: "",
     showAddClient: false, savingClient: false, ncError: "",
@@ -690,8 +693,7 @@ class Component extends DCLogic {
       return this.setState({ npError: "Completá al menos título, zona y precio." });
     }
     this.setState({ savingProp: true, npError: "" });
-    const { error } = await sb.from("properties").insert({
-      user_id: userId,
+    const payload = {
       titulo: s.npTitulo.trim(),
       zona: s.npZona.trim(),
       descripcion: s.npDescripcion.trim() || null,
@@ -703,10 +705,13 @@ class Component extends DCLogic {
       area_unidad: s.npArea ? s.npAreaUnidad : null,
       lat: s.npLat !== "" ? Number(s.npLat) : null,
       lng: s.npLng !== "" ? Number(s.npLng) : null
-    });
+    };
+    const { error } = s.npEditId
+      ? await sb.from("properties").update(payload).eq("id", s.npEditId)
+      : await sb.from("properties").insert({ user_id: userId, ...payload });
     if (error) return this.setState({ savingProp: false, npError: "No se pudo guardar: " + error.message });
     this.setState({
-      savingProp: false, showAddProp: false,
+      savingProp: false, showAddProp: false, npEditId: null,
       npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
       npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: ""
     });
@@ -733,6 +738,42 @@ class Component extends DCLogic {
       ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto"
     });
     this.loadAll(userId);
+  }
+
+  // Enter en el buscador: no filtra solo la pantalla actual, salta a donde
+  // realmente esté la coincidencia (propiedad o cliente), sin importar en
+  // qué pantalla estaba el usuario cuando escribió.
+  buscarEnter() {
+    const q = (this.state.busqueda || "").trim().toLowerCase();
+    if (!q) return;
+    const props = this.state.properties || [];
+    const clients = this.state.clients || [];
+    const propMatches = props.filter(p => p.titulo.toLowerCase().includes(q) || (p.zona || "").toLowerCase().includes(q)).length;
+    const clientMatches = clients.filter(c => c.nombre.toLowerCase().includes(q) || (c.busca || "").toLowerCase().includes(q)).length;
+    const s = this.state.screen;
+    if (clientMatches > 0 && (propMatches === 0 || s === "clientes")) {
+      this.setState({ screen: "clientes" });
+    } else if (propMatches > 0 && (clientMatches === 0 || s === "props")) {
+      this.setState({ screen: "props" });
+    } else if (clientMatches > 0) {
+      this.setState({ screen: "clientes" });
+    } else if (propMatches > 0) {
+      this.setState({ screen: "props" });
+    }
+  }
+
+  abrirEditarProp(p) {
+    this.setState({
+      showAddProp: true, npError: "", npEditId: p.id,
+      npTitulo: p.titulo || "", npZona: p.zona || "", npDescripcion: p.descripcion || "",
+      npTipo: p.tipo || "Casa", npEstado: p.estado || "Disponible",
+      npPrecio: p.precio != null ? String(p.precio) : "",
+      npHabitaciones: p.habitaciones != null ? String(p.habitaciones) : "",
+      npArea: p.area != null ? String(p.area) : "",
+      npAreaUnidad: p.area_unidad || "m2",
+      npLat: p.lat != null ? String(p.lat) : "",
+      npLng: p.lng != null ? String(p.lng) : ""
+    });
   }
 
   renderVals() {
@@ -762,6 +803,11 @@ class Component extends DCLogic {
     const propsList = propsData.filter(p => (f === "Todas" || p.tipo === f) && (!q || p.t.toLowerCase().includes(q) || (p.z || "").toLowerCase().includes(q))).map(p => ({
       ...p,
       go: () => { this.setState({ activa: this.state.activa === p.id ? null : p.id }); this.post({ type: "focus", id: p.id }); },
+      editar: e => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const raw = (this.state.properties || []).find(x => x.id === p.id);
+        if (raw) this.abrirEditarProp(raw);
+      },
       cardStyle: `background:#FBF9F5; border:1px solid ${this.state.activa === p.id ? "rgba(192,138,62,.75)" : "rgba(20,33,43,.08)"}; border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s ease`,
       badge: `font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 8px; border-radius:99px; white-space:nowrap; color:${col[p.est]}; background:${col[p.est]}1f`,
       expandido: this.state.activa === p.id,
@@ -928,6 +974,7 @@ class Component extends DCLogic {
       ].map(l => ({ ...l, dot: `width:9px; height:9px; border-radius:50%; background:${l.c}; display:inline-block` })),
       busqueda: st.busqueda,
       setBusqueda: e => this.setState({ busqueda: e.target.value }),
+      onBusquedaKeyDown: e => { if (e.key === "Enter") this.buscarEnter(); },
       pipeline: ["Contacto", "Visita", "Negociando", "Cerrado"].map(etapa => {
         const cards = (this.state.clients || [])
           .filter(c => c.etapa === etapa)
@@ -942,9 +989,14 @@ class Component extends DCLogic {
       comKpis, bars, rows,
 
       showAddProp: st.showAddProp,
-      abrirNuevaProp: () => this.setState({ showAddProp: true, npError: "" }),
-      cerrarNuevaProp: () => this.setState({ showAddProp: false, npError: "" }),
-      npGuardarLabel: st.savingProp ? "Guardando…" : "Guardar propiedad",
+      abrirNuevaProp: () => this.setState({
+        showAddProp: true, npError: "", npEditId: null,
+        npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
+        npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: ""
+      }),
+      cerrarNuevaProp: () => this.setState({ showAddProp: false, npError: "", npEditId: null }),
+      npModalTitle: st.npEditId ? "Editar propiedad" : "Nueva propiedad",
+      npGuardarLabel: st.savingProp ? "Guardando…" : (st.npEditId ? "Guardar cambios" : "Guardar propiedad"),
       npGuardarStyle: `flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; ${st.savingProp ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
       npError: st.npError,
       npTitulo: st.npTitulo, setNpTitulo: e => this.setState({ npTitulo: e.target.value }),
