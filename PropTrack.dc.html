@@ -11,31 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<style>
-  body { margin:0; background:#EFEAE0; }
-  * { box-sizing:border-box; }
-  a { color:#8A5E1F; text-decoration:none; }
-  a:hover { color:#C08A3E; }
-  ::selection { background:#C08A3E33; }
-
-  /* Responsive: el layout de escritorio usa grids/flex de ancho fijo por
-     estilo inline; estas reglas los reacomodan en pantallas angostas. */
-  @media (max-width: 860px) {
-    .pt-login { grid-template-columns: 1fr !important; }
-    .pt-app { flex-direction: column !important; }
-    .pt-sidebar { width: 100% !important; height: auto !important; position: relative !important; top: auto !important; }
-    .pt-props-split { grid-template-columns: 1fr !important; }
-    .pt-map-frame { height: 420px !important; }
-    .pt-resumen-split { grid-template-columns: 1fr !important; }
-    .pt-kpis4, .pt-kpis3, .pt-pipeline { grid-template-columns: repeat(2, 1fr) !important; }
-    .pt-header { flex-wrap: wrap; row-gap: 12px; padding: 16px 20px !important; }
-    .pt-header > div:last-child { width: 100%; justify-content: space-between; }
-  }
-
-  @media (max-width: 520px) {
-    .pt-kpis4, .pt-kpis3, .pt-pipeline { grid-template-columns: 1fr !important; }
-  }
-</style>
+<link rel="stylesheet" href="./pt-style.css">
 </helmet>
 
 <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">

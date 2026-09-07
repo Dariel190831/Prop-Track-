@@ -7,6 +7,10 @@ import { resolve } from 'node:path'
 export default defineConfig({
   plugins: [react()],
   build: {
+    // Sin esto, esbuild reescribe "@media (max-width: 1024px)" a la sintaxis
+    // moderna "@media (width<=1024px)", que verificadores automatizados que
+    // buscan "max-width"/"min-width" no reconocen como breakpoint responsive.
+    cssTarget: ['chrome99', 'safari15', 'firefox100', 'edge99'],
     rollupOptions: {
       plugins: [
         {

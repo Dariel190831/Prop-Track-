@@ -1,0 +1,23 @@
+body { margin:0; background:#EFEAE0; }
+* { box-sizing:border-box; }
+a { color:#8A5E1F; text-decoration:none; }
+a:hover { color:#C08A3E; }
+::selection { background:#C08A3E33; }
+
+/* Responsive: el layout de escritorio usa grids/flex de ancho fijo por
+   estilo inline; estas reglas los reacomodan en pantallas angostas. */
+@media (max-width: 860px) {
+  .pt-login { grid-template-columns: 1fr !important; }
+  .pt-app { flex-direction: column !important; }
+  .pt-sidebar { width: 100% !important; height: auto !important; position: relative !important; top: auto !important; }
+  .pt-props-split { grid-template-columns: 1fr !important; }
+  .pt-map-frame { height: 420px !important; }
+  .pt-resumen-split { grid-template-columns: 1fr !important; }
+  .pt-kpis4, .pt-kpis3, .pt-pipeline { grid-template-columns: repeat(2, 1fr) !important; }
+  .pt-header { flex-wrap: wrap; row-gap: 12px; padding: 16px 20px !important; }
+  .pt-header > div:last-child { width: 100%; justify-content: space-between; }
+}
+
+@media (max-width: 520px) {
+  .pt-kpis4, .pt-kpis3, .pt-pipeline { grid-template-columns: 1fr !important; }
+}
