@@ -17,11 +17,29 @@
   a { color:#8A5E1F; text-decoration:none; }
   a:hover { color:#C08A3E; }
   ::selection { background:#C08A3E33; }
+
+  /* Responsive: el layout de escritorio usa grids/flex de ancho fijo por
+     estilo inline; estas reglas los reacomodan en pantallas angostas. */
+  @media (max-width: 860px) {
+    .pt-login { grid-template-columns: 1fr !important; }
+    .pt-app { flex-direction: column !important; }
+    .pt-sidebar { width: 100% !important; height: auto !important; position: relative !important; top: auto !important; }
+    .pt-props-split { grid-template-columns: 1fr !important; }
+    .pt-map-frame { height: 420px !important; }
+    .pt-resumen-split { grid-template-columns: 1fr !important; }
+    .pt-kpis4, .pt-kpis3, .pt-pipeline { grid-template-columns: repeat(2, 1fr) !important; }
+    .pt-header { flex-wrap: wrap; row-gap: 12px; padding: 16px 20px !important; }
+    .pt-header > div:last-child { width: 100%; justify-content: space-between; }
+  }
+
+  @media (max-width: 520px) {
+    .pt-kpis4, .pt-kpis3, .pt-pipeline { grid-template-columns: 1fr !important; }
+  }
 </style>
 </helmet>
 
 <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
-  <div style="min-height:100vh; display:grid; grid-template-columns:1.05fr .95fr; font-family:'Work Sans', system-ui, sans-serif; color:#14212B; background:#EFEAE0">
+  <div class="pt-login" style="min-height:100vh; display:grid; grid-template-columns:1.05fr .95fr; font-family:'Work Sans', system-ui, sans-serif; color:#14212B; background:#EFEAE0">
 
     <div style="background:#101F2B; color:#F4F0E8; padding:56px 60px; display:flex; flex-direction:column; justify-content:space-between">
       <div>
@@ -99,7 +117,7 @@
         <div style="font-size:14.5px; color:#5E6771; margin-top:6px">Los primeros 14 días no se cobran. Cancelás cuando quieras.</div>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:32px; align-items:stretch">
+      <div class="pt-kpis3" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:32px; align-items:stretch">
         <sc-for list="{{ planes }}" as="p" hint-placeholder-count="3">
           <div onClick="{{ p.go }}" style="{{ p.style }}">
             <div style="display:flex; align-items:center; justify-content:space-between">
@@ -156,9 +174,9 @@
 </sc-if>
 
 <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
-<div style="display:flex; min-height:100vh; font-family:'Work Sans', system-ui, sans-serif; color:#14212B; background:#EFEAE0">
+<div class="pt-app" style="display:flex; min-height:100vh; font-family:'Work Sans', system-ui, sans-serif; color:#14212B; background:#EFEAE0">
 
-  <aside style="width:260px; flex:none; background:#101F2B; color:#F4F0E8; display:flex; flex-direction:column; padding:28px 18px; position:sticky; top:0; height:100vh">
+  <aside class="pt-sidebar" style="width:260px; flex:none; background:#101F2B; color:#F4F0E8; display:flex; flex-direction:column; padding:28px 18px; position:sticky; top:0; height:100vh">
     <div style="padding:0 10px 26px 10px; border-bottom:1px solid rgba(244,240,232,.12)">
       <div style="font-family:'Newsreader', serif; font-size:27px; font-weight:600; letter-spacing:-.01em">PropTrack</div>
       <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.16em; color:#8FA3B2; margin-top:6px">SAN PEDRO SULA · HN</div>
@@ -194,7 +212,7 @@
 
   <main style="flex:1; min-width:0; display:flex; flex-direction:column">
 
-    <header style="display:flex; align-items:center; justify-content:space-between; padding:20px 40px; background:#FBF9F5; border-bottom:1px solid rgba(20,33,43,.09); position:sticky; top:0; z-index:5">
+    <header class="pt-header" style="display:flex; align-items:center; justify-content:space-between; padding:20px 40px; background:#FBF9F5; border-bottom:1px solid rgba(20,33,43,.09); position:sticky; top:0; z-index:5">
       <div style="display:flex; align-items:baseline; gap:10px">
         <span style="font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.12em; color:#8B939C">PROPTRACK /</span>
         <span style="font-family:'Newsreader', serif; font-size:19px; font-weight:600">{{ title }}</span>
@@ -220,7 +238,7 @@
         <div style="font-family:'Newsreader', serif; font-size:38px; font-weight:600; letter-spacing:-.015em">{{ saludo }}</div>
         <div style="color:#5E6771; font-size:15px; margin-top:6px">Esto es lo que necesitás saber hoy sobre tu cartera.</div>
 
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:28px">
+        <div class="pt-kpis4" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:28px">
           <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
             <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:16px; padding:20px 22px">
               <div style="display:flex; justify-content:space-between; align-items:center">
@@ -233,7 +251,7 @@
           </sc-for>
         </div>
 
-        <div style="display:grid; grid-template-columns:1.35fr 1fr; gap:20px; margin-top:22px">
+        <div class="pt-resumen-split" style="display:grid; grid-template-columns:1.35fr 1fr; gap:20px; margin-top:22px">
 
           <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:18px; padding:24px 26px">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px">
@@ -278,7 +296,7 @@
     </sc-if>
 
     <sc-if value="{{ isProps }}" hint-placeholder-val="{{ false }}">
-      <div style="display:grid; grid-template-columns:420px 1fr; flex:1; min-height:0">
+      <div class="pt-props-split" style="display:grid; grid-template-columns:420px 1fr; flex:1; min-height:0">
         <div style="border-right:1px solid rgba(20,33,43,.09); padding:26px 24px; overflow:auto; max-height:calc(100vh - 69px)">
           <div style="display:flex; align-items:baseline; justify-content:space-between">
             <div style="font-family:'Newsreader', serif; font-size:26px; font-weight:600">Propiedades</div>
@@ -320,7 +338,7 @@
           </div>
         </div>
         <div style="position:relative; background:#E8E2D6">
-          <iframe ref="{{ mapRef }}" src="./mapa.html" style="width:100%; height:calc(100vh - 69px); border:none; display:block"></iframe>
+          <iframe class="pt-map-frame" ref="{{ mapRef }}" src="./mapa.html" style="width:100%; height:calc(100vh - 69px); border:none; display:block"></iframe>
           <div style="position:absolute; bottom:18px; left:18px; background:#FBF9F5; border:1px solid rgba(20,33,43,.1); border-radius:12px; padding:12px 16px; box-shadow:0 6px 20px rgba(20,33,43,.12); display:flex; flex-direction:column; gap:8px">
             <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#8B939C">ESTADO</div>
             <sc-for list="{{ leyenda }}" as="l" hint-placeholder-count="3">
@@ -342,7 +360,7 @@
           </div>
           <div onClick="{{ abrirNuevoCliente }}" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
         </div>
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:26px; align-items:start">
+        <div class="pt-pipeline" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:26px; align-items:start">
           <sc-for list="{{ pipeline }}" as="col" hint-placeholder-count="4">
             <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:16px; padding:16px">
               <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 4px 12px">
@@ -372,7 +390,7 @@
         <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">Comisiones</div>
         <div style="color:#5E6771; font-size:14.5px; margin-top:5px">Proyección del año y detalle por operación.</div>
 
-        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:26px">
+        <div class="pt-kpis3" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:26px">
           <sc-for list="{{ comKpis }}" as="k" hint-placeholder-count="3">
             <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:16px; padding:20px 22px">
               <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#8B939C">{{ k.label }}</div>
