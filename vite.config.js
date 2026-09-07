@@ -26,4 +26,14 @@ export default defineConfig({
       ],
     },
   },
+  test: {
+    // Cobertura acotada al código realmente unit-testeable (ver ADR-002):
+    // el prototipo PropTrack.dc.html vive fuera de este alcance a propósito.
+    coverage: {
+      provider: 'v8',
+      reportsDirectory: 'coverage',
+      reporter: ['text', 'json-summary', 'lcov'],
+      include: ['src/**/*.js'],
+    },
+  },
 })

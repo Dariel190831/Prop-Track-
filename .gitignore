@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Reporte HTML de cobertura (se regenera con `npm run test:coverage`);
+# coverage-summary.json y lcov.info sí se versionan a propósito.
+coverage/lcov-report/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
