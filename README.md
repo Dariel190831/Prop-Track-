@@ -11,6 +11,30 @@ npm run dev
 
 La aplicación React se sirve en la raíz. El prototipo original está disponible en `/PropTrack.dc.html`.
 
+### Variables de entorno
+
+Crea un archivo `.env.local` (no se sube al repo) con:
+
+```
+VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+VITE_SUPABASE_ANON_KEY=tu-anon-key
+```
+
+Ambas se obtienen en el dashboard de Supabase, en Settings → API. La
+anon key es pública por diseño (protegida por las políticas RLS de
+cada tabla), pero igual mantenemos el archivo fuera de git.
+
+### Tests y CI
+
+```bash
+npm test        # vitest, cubre las funciones de formato en src/format.js
+npm run lint    # oxlint
+npm run build   # build de producción con Vite
+```
+
+Las tres corren automáticamente en cada push/PR a `main` vía
+`.github/workflows/ci.yml`.
+
 ## Base de datos (Supabase)
 
 El esquema vive en `supabase/migrations/`, un archivo `.sql` por cambio,
@@ -36,3 +60,7 @@ al mismo `DATABASE_URL`.
 
 Los KPIs del dashboard (`v_dashboard_kpis`, `v_comisiones_por_mes`) son
 vistas SQL, no se calculan en el frontend — una sola fuente de verdad.
+
+## Verificación
+
+LEARN-CAP-513D0CC5
