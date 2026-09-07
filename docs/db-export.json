@@ -1,0 +1,435 @@
+{
+  "generado_at": "2026-09-07T03:56:50.530Z",
+  "motor": "postgres",
+  "tablas": [
+    {
+      "nombre": "activities",
+      "filas": 8,
+      "columnas": [
+        {
+          "nombre": "id",
+          "tipo": "uuid",
+          "pk": true,
+          "nulo": false
+        },
+        {
+          "nombre": "user_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "texto",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "tipo",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "created_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        }
+      ],
+      "indices": [
+        "activities_pkey"
+      ],
+      "relaciones": [
+        {
+          "columna": "user_id",
+          "referencia": "auth.users.id"
+        }
+      ],
+      "politicas_rls": [
+        "activities_own"
+      ]
+    },
+    {
+      "nombre": "clients",
+      "filas": 12,
+      "columnas": [
+        {
+          "nombre": "id",
+          "tipo": "uuid",
+          "pk": true,
+          "nulo": false
+        },
+        {
+          "nombre": "user_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "nombre",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "busca",
+          "tipo": "text",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "presupuesto",
+          "tipo": "numeric",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "etapa",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "created_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "updated_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        }
+      ],
+      "indices": [
+        "clients_pkey"
+      ],
+      "relaciones": [
+        {
+          "columna": "user_id",
+          "referencia": "auth.users.id"
+        }
+      ],
+      "politicas_rls": [
+        "clients_own"
+      ]
+    },
+    {
+      "nombre": "deals",
+      "filas": 8,
+      "columnas": [
+        {
+          "nombre": "id",
+          "tipo": "uuid",
+          "pk": true,
+          "nulo": false
+        },
+        {
+          "nombre": "user_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "property_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "client_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "cliente_nombre",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "valor",
+          "tipo": "numeric",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "comision",
+          "tipo": "numeric",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "fecha_cierre",
+          "tipo": "date",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "created_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        }
+      ],
+      "indices": [
+        "deals_pkey"
+      ],
+      "relaciones": [
+        {
+          "columna": "client_id",
+          "referencia": "clients.id"
+        },
+        {
+          "columna": "property_id",
+          "referencia": "properties.id"
+        },
+        {
+          "columna": "user_id",
+          "referencia": "auth.users.id"
+        }
+      ],
+      "politicas_rls": [
+        "deals_own"
+      ]
+    },
+    {
+      "nombre": "matches",
+      "filas": 6,
+      "columnas": [
+        {
+          "nombre": "id",
+          "tipo": "uuid",
+          "pk": true,
+          "nulo": false
+        },
+        {
+          "nombre": "user_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "client_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "property_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "score",
+          "tipo": "integer",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "created_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        }
+      ],
+      "indices": [
+        "matches_pkey"
+      ],
+      "relaciones": [
+        {
+          "columna": "client_id",
+          "referencia": "clients.id"
+        },
+        {
+          "columna": "property_id",
+          "referencia": "properties.id"
+        },
+        {
+          "columna": "user_id",
+          "referencia": "auth.users.id"
+        }
+      ],
+      "politicas_rls": [
+        "matches_own"
+      ]
+    },
+    {
+      "nombre": "profiles",
+      "filas": 2,
+      "columnas": [
+        {
+          "nombre": "id",
+          "tipo": "uuid",
+          "pk": true,
+          "nulo": false
+        },
+        {
+          "nombre": "nombre",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "plan",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "meta_mensual",
+          "tipo": "numeric",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "created_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        }
+      ],
+      "indices": [
+        "profiles_pkey"
+      ],
+      "relaciones": [
+        {
+          "columna": "id",
+          "referencia": "auth.users.id"
+        }
+      ],
+      "politicas_rls": [
+        "profiles_own"
+      ]
+    },
+    {
+      "nombre": "properties",
+      "filas": 16,
+      "columnas": [
+        {
+          "nombre": "id",
+          "tipo": "uuid",
+          "pk": true,
+          "nulo": false
+        },
+        {
+          "nombre": "user_id",
+          "tipo": "uuid",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "titulo",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "zona",
+          "tipo": "text",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "tipo",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "precio",
+          "tipo": "numeric",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "estado",
+          "tipo": "text",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "habitaciones",
+          "tipo": "integer",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "area",
+          "tipo": "numeric",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "area_unidad",
+          "tipo": "text",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "lat",
+          "tipo": "double precision",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "lng",
+          "tipo": "double precision",
+          "pk": false,
+          "nulo": true
+        },
+        {
+          "nombre": "created_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        },
+        {
+          "nombre": "descripcion",
+          "tipo": "text",
+          "pk": false,
+          "nulo": true
+        }
+      ],
+      "indices": [
+        "properties_pkey"
+      ],
+      "relaciones": [
+        {
+          "columna": "user_id",
+          "referencia": "auth.users.id"
+        }
+      ],
+      "politicas_rls": [
+        "properties_own"
+      ]
+    },
+    {
+      "nombre": "schema_migrations",
+      "filas": 4,
+      "columnas": [
+        {
+          "nombre": "version",
+          "tipo": "text",
+          "pk": true,
+          "nulo": false
+        },
+        {
+          "nombre": "applied_at",
+          "tipo": "timestamp with time zone",
+          "pk": false,
+          "nulo": false
+        }
+      ],
+      "indices": [
+        "schema_migrations_pkey"
+      ],
+      "relaciones": [],
+      "politicas_rls": []
+    }
+  ]
+}
