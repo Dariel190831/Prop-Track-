@@ -41,7 +41,7 @@
       <div style="width:100%; max-width:380px">
         <div style="display:flex; background:#E4DDCE; border-radius:99px; padding:4px; gap:4px">
           <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
-            <div onClick="{{ t.go }}" onKeyDown="{{ t.goKey }}" tabIndex="0" style="{{ t.style }}">{{ t.label }}</div>
+            <div onClick="{{ t.go }}" onKeyDown="{{ t.goKey }}" role="button" tabIndex="0" style="{{ t.style }}">{{ t.label }}</div>
           </sc-for>
         </div>
 
@@ -65,7 +65,7 @@
             <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#6B7480">CONTRASEÑA</span>
             <div style="position:relative; display:flex; align-items:center">
               <input value="{{ clave }}" onChange="{{ setClave }}" type="{{ claveType }}" placeholder="••••••••" style="flex:1; border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 62px 12px 14px; font-family:'Work Sans', sans-serif; font-size:14px; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
-              <span onClick="{{ toggleClave }}" onKeyDown="{{ toggleClaveKey }}" tabIndex="0" style="position:absolute; right:12px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; color:#8A5E1F; cursor:pointer">{{ claveLabel }}</span>
+              <span onClick="{{ toggleClave }}" onKeyDown="{{ toggleClaveKey }}" role="button" tabIndex="0" style="position:absolute; right:12px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; color:#8A5E1F; cursor:pointer">{{ claveLabel }}</span>
             </div>
           </label>
 
@@ -73,7 +73,7 @@
             <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:10px; padding:10px 13px; font-size:12.5px; color:#8E3E29">{{ authMsgText }}</div>
           </sc-if>
 
-          <div onClick="{{ entrar }}" onKeyDown="{{ entrarKey }}" tabIndex="0" style="{{ authCtaStyle }}" style-hover="background:#1B3040">{{ authCta }}</div>
+          <div onClick="{{ entrar }}" onKeyDown="{{ entrarKey }}" role="button" tabIndex="0" style="{{ authCtaStyle }}" style-hover="background:#1B3040">{{ authCta }}</div>
 
           <div style="display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:#6B7480">
             <span style="cursor:pointer" style-hover="color:#8A5E1F">¿Olvidaste tu contraseña?</span>
@@ -96,7 +96,7 @@
 
       <div class="pt-kpis3" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:32px; align-items:stretch">
         <sc-for list="{{ planes }}" as="p" hint-placeholder-count="3">
-          <div onClick="{{ p.go }}" onKeyDown="{{ p.goKey }}" tabIndex="0" style="{{ p.style }}">
+          <div onClick="{{ p.go }}" onKeyDown="{{ p.goKey }}" role="button" tabIndex="0" style="{{ p.style }}">
             <div style="display:flex; align-items:center; justify-content:space-between">
               <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:{{ p.metaColor }}">{{ p.tag }}</span>
               <span style="{{ p.radio }}"></span>
@@ -142,8 +142,8 @@
             <span style="font-family:'Newsreader', serif; font-size:26px">$0.00</span>
           </div>
           <div style="font-size:11.5px; color:#8B939C; margin-top:8px; line-height:1.5">Luego {{ planPrecio }} {{ planPeriodo }} a partir del {{ fechaPrueba }}.</div>
-          <div onClick="{{ activar }}" onKeyDown="{{ activarKey }}" tabIndex="0" style="background:#C08A3E; color:#101F2B; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#D19B4C">Activar suscripción</div>
-          <div onClick="{{ salir }}" onKeyDown="{{ salirKey }}" tabIndex="0" style="text-align:center; font-size:12.5px; color:#6B7480; margin-top:12px; cursor:pointer" style-hover="color:#8A5E1F">Volver al inicio de sesión</div>
+          <div onClick="{{ activar }}" onKeyDown="{{ activarKey }}" role="button" tabIndex="0" style="background:#C08A3E; color:#101F2B; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#D19B4C">Activar suscripción</div>
+          <div onClick="{{ salir }}" onKeyDown="{{ salirKey }}" role="button" tabIndex="0" style="text-align:center; font-size:12.5px; color:#6B7480; margin-top:12px; cursor:pointer" style-hover="color:#8A5E1F">Volver al inicio de sesión</div>
         </div>
       </div>
     </div>
@@ -161,7 +161,7 @@
 
     <nav style="display:flex; flex-direction:column; gap:4px; margin-top:22px">
       <sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
-        <div onClick="{{ item.go }}" onKeyDown="{{ item.goKey }}" tabIndex="0" style="{{ item.style }}" style-hover="background:rgba(244,240,232,.09)">
+        <div onClick="{{ item.go }}" onKeyDown="{{ item.goKey }}" role="button" tabIndex="0" style="{{ item.style }}" style-hover="background:rgba(244,240,232,.09)">
           <span style="width:22px; text-align:center; font-size:15px; opacity:.9">{{ item.icon }}</span>
           <span style="font-size:14.5px; font-weight:500">{{ item.label }}</span>
         </div>
@@ -182,7 +182,7 @@
           <div style="font-size:13.5px; font-weight:600">{{ nombreCuenta }}</div>
           <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8FA3B2">Plan {{ planNombre }} · $7/mes</div>
         </div>
-        <span onClick="{{ salir }}" onKeyDown="{{ salirKey }}" tabIndex="0" title="Cerrar sesión" style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8FA3B2; cursor:pointer" style-hover="color:#C08A3E">SALIR</span>
+        <span onClick="{{ salir }}" onKeyDown="{{ salirKey }}" role="button" tabIndex="0" title="Cerrar sesión" style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8FA3B2; cursor:pointer" style-hover="color:#C08A3E">SALIR</span>
       </div>
     </div>
   </aside>
@@ -207,7 +207,7 @@
     <sc-if value="{{ loadError }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 40px; background:#B4553C1a; border-bottom:1px solid #B4553C55; font-size:13px; color:#8E3E29">
         <span>No se pudieron cargar algunos datos. Puede ser un problema de conexión pasajero.</span>
-        <span onClick="{{ reintentar }}" onKeyDown="{{ reintentarKey }}" tabIndex="0" style="font-weight:600; cursor:pointer; white-space:nowrap" style-hover="color:#B4553C">Reintentar →</span>
+        <span onClick="{{ reintentar }}" onKeyDown="{{ reintentarKey }}" role="button" tabIndex="0" style="font-weight:600; cursor:pointer; white-space:nowrap" style-hover="color:#B4553C">Reintentar →</span>
       </div>
     </sc-if>
 
@@ -252,7 +252,7 @@
                 </div>
               </sc-for>
             </div>
-            <div onClick="{{ goClientes }}" onKeyDown="{{ goClientesKey }}" tabIndex="0" style="margin-top:18px; font-size:13.5px; font-weight:600; color:#8A5E1F; cursor:pointer">Ver todos los clientes →</div>
+            <div onClick="{{ goClientes }}" onKeyDown="{{ goClientesKey }}" role="button" tabIndex="0" style="margin-top:18px; font-size:13.5px; font-weight:600; color:#8A5E1F; cursor:pointer">Ver todos los clientes →</div>
           </div>
 
           <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:18px; padding:24px 26px">
@@ -280,15 +280,15 @@
             <div style="font-family:'Newsreader', serif; font-size:26px; font-weight:600">Propiedades</div>
             <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#6B7480">{{ propsCount }}</span>
           </div>
-          <div onClick="{{ abrirNuevaProp }}" onKeyDown="{{ abrirNuevaPropKey }}" tabIndex="0" style="margin-top:14px; background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px; text-align:center; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">+ Agregar propiedad</div>
+          <div onClick="{{ abrirNuevaProp }}" onKeyDown="{{ abrirNuevaPropKey }}" role="button" tabIndex="0" style="margin-top:14px; background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px; text-align:center; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">+ Agregar propiedad</div>
           <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
             <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
-              <div onClick="{{ f.go }}" onKeyDown="{{ f.goKey }}" tabIndex="0" style="{{ f.style }}">{{ f.label }}</div>
+              <div onClick="{{ f.go }}" onKeyDown="{{ f.goKey }}" role="button" tabIndex="0" style="{{ f.style }}">{{ f.label }}</div>
             </sc-for>
           </div>
           <div style="display:flex; flex-direction:column; gap:12px; margin-top:18px">
             <sc-for list="{{ propsList }}" as="p" hint-placeholder-count="5">
-              <div onClick="{{ p.go }}" onKeyDown="{{ p.goKey }}" tabIndex="0" style="{{ p.cardStyle }}" style-hover="border-color:rgba(192,138,62,.55)">
+              <div onClick="{{ p.go }}" onKeyDown="{{ p.goKey }}" role="button" tabIndex="0" style="{{ p.cardStyle }}" style-hover="border-color:rgba(192,138,62,.55)">
                 <div style="display:flex; gap:14px">
                   <div style="width:74px; height:74px; border-radius:10px; flex:none; background:repeating-linear-gradient(135deg,#E4DDCE,#E4DDCE 6px,#EFEAE0 6px,#EFEAE0 12px); display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px">
                     <span style="font-family:'JetBrains Mono', monospace; font-size:8px; color:#8B939C">FOTO</span>
@@ -298,7 +298,7 @@
                       <div style="font-size:14.5px; font-weight:600; line-height:1.3">{{ p.t }}</div>
                       <div style="display:flex; align-items:center; gap:6px; flex:none">
                         <span style="{{ p.badge }}">{{ p.est }}</span>
-                        <span onClick="{{ p.editar }}" onKeyDown="{{ p.editarKey }}" tabIndex="0" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
+                        <span onClick="{{ p.editar }}" onKeyDown="{{ p.editarKey }}" role="button" tabIndex="0" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
                       </div>
                     </div>
                     <div style="font-size:12.5px; color:#6B7480; margin-top:4px">{{ p.z }}</div>
@@ -336,7 +336,7 @@
             <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">Clientes</div>
             <div style="color:#5E6771; font-size:14.5px; margin-top:5px">Seguimiento del embudo, de primer contacto a cierre.</div>
           </div>
-          <div onClick="{{ abrirNuevoCliente }}" onKeyDown="{{ abrirNuevoClienteKey }}" tabIndex="0" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
+          <div onClick="{{ abrirNuevoCliente }}" onKeyDown="{{ abrirNuevoClienteKey }}" role="button" tabIndex="0" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
         </div>
         <div class="pt-pipeline" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:26px; align-items:start">
           <sc-for list="{{ pipeline }}" as="col" hint-placeholder-count="4">
@@ -477,8 +477,8 @@
               <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:9px; padding:9px 12px; font-size:12.5px; color:#8E3E29">{{ npError }}</div>
             </sc-if>
             <div style="display:flex; gap:10px; margin-top:8px">
-              <div onClick="{{ cerrarNuevaProp }}" onKeyDown="{{ cerrarNuevaPropKey }}" tabIndex="0" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
-              <div onClick="{{ guardarNuevaProp }}" onKeyDown="{{ guardarNuevaPropKey }}" tabIndex="0" style="{{ npGuardarStyle }}" style-hover="background:#1B3040">{{ npGuardarLabel }}</div>
+              <div onClick="{{ cerrarNuevaProp }}" onKeyDown="{{ cerrarNuevaPropKey }}" role="button" tabIndex="0" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
+              <div onClick="{{ guardarNuevaProp }}" onKeyDown="{{ guardarNuevaPropKey }}" role="button" tabIndex="0" style="{{ npGuardarStyle }}" style-hover="background:#1B3040">{{ npGuardarLabel }}</div>
             </div>
           </div>
         </div>
@@ -517,8 +517,8 @@
               <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:9px; padding:9px 12px; font-size:12.5px; color:#8E3E29">{{ ncError }}</div>
             </sc-if>
             <div style="display:flex; gap:10px; margin-top:8px">
-              <div onClick="{{ cerrarNuevoCliente }}" onKeyDown="{{ cerrarNuevoClienteKey }}" tabIndex="0" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
-              <div onClick="{{ guardarNuevoCliente }}" onKeyDown="{{ guardarNuevoClienteKey }}" tabIndex="0" style="{{ ncGuardarStyle }}" style-hover="background:#1B3040">{{ ncGuardarLabel }}</div>
+              <div onClick="{{ cerrarNuevoCliente }}" onKeyDown="{{ cerrarNuevoClienteKey }}" role="button" tabIndex="0" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
+              <div onClick="{{ guardarNuevoCliente }}" onKeyDown="{{ guardarNuevoClienteKey }}" role="button" tabIndex="0" style="{{ ncGuardarStyle }}" style-hover="background:#1B3040">{{ ncGuardarLabel }}</div>
             </div>
           </div>
         </div>

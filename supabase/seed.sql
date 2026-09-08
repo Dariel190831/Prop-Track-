@@ -23,6 +23,11 @@ declare
   v_cli_ana uuid;
   v_cli_roberto uuid;
   v_cli_rg uuid;
+  -- constantes: evita repetir estos literales sueltos por el script
+  c_disponible constant text := 'Disponible';
+  c_vendida constant text := 'Vendida';
+  c_nombre_ana constant text := 'Ana Cruz';
+  c_nombre_rg constant text := 'Inversiones RG';
 begin
   foreach v_email in array v_emails loop
 
@@ -66,28 +71,28 @@ begin
     -- Propiedades (San Pedro Sula — coordenadas verificadas por barrio)
     insert into public.properties (id, user_id, titulo, zona, tipo, precio, estado, habitaciones, area, area_unidad, descripcion, lat, lng)
     values
-      (gen_random_uuid(), v_user_id, 'Casa Residencial Jardines del Valle', 'Jardines del Valle', 'Casa', 3850000, 'Disponible', 3, 240, 'm2',
+      (gen_random_uuid(), v_user_id, 'Casa Residencial Jardines del Valle', 'Jardines del Valle', 'Casa', 3850000, c_disponible, 3, 240, 'm2',
         'Casa moderna de dos niveles en una de las zonas residenciales más buscadas de San Pedro Sula. Jardín amplio, cochera techada para dos vehículos y acabados de lujo en cocina y baños.',
         15.5278, -88.0339),
       (gen_random_uuid(), v_user_id, 'Apartamento Torre Aria', 'El Pedregal', 'Apartamento', 2150000, 'Negociando', 2, 96, 'm2',
         'Apartamento en torre de reciente construcción con vista panorámica a la ciudad, seguridad 24/7, gimnasio y área social. Ideal para pareja joven o profesional.',
         15.5400, -88.0500),
-      (gen_random_uuid(), v_user_id, 'Casa Colonia Trejo', 'La Trejo', 'Casa', 1980000, 'Disponible', 3, 180, 'm2',
+      (gen_random_uuid(), v_user_id, 'Casa Colonia Trejo', 'La Trejo', 'Casa', 1980000, c_disponible, 3, 180, 'm2',
         'Casa familiar de un nivel en colonia tradicional y consolidada, cerca de centros educativos y comerciales. Patio trasero amplio, ideal para ampliación.',
         15.4850, -88.0450),
-      (gen_random_uuid(), v_user_id, 'Local comercial Río de Piedras', 'Río de Piedras', 'Local', 4400000, 'Vendida', null, 320, 'm2',
+      (gen_random_uuid(), v_user_id, 'Local comercial Río de Piedras', 'Río de Piedras', 'Local', 4400000, c_vendida, null, 320, 'm2',
         'Local comercial de dos plantas sobre vía principal con alto flujo vehicular y peatonal. Excelente para restaurante, farmacia o sucursal bancaria.',
         15.4750, -88.0500),
-      (gen_random_uuid(), v_user_id, 'Terreno Rivera Hernández', 'Rivera Hernández', 'Terreno', 950000, 'Disponible', null, 1100, 'v2',
+      (gen_random_uuid(), v_user_id, 'Terreno Rivera Hernández', 'Rivera Hernández', 'Terreno', 950000, c_disponible, null, 1100, 'v2',
         'Terreno plano y esquinero, listo para construir, con todos los servicios básicos disponibles en el sector. Buena plusvalía por el crecimiento habitacional de la zona.',
         15.4726, -87.9493),
-      (gen_random_uuid(), v_user_id, 'Apartamento Moderna 402', 'Colonia Moderna', 'Apartamento', 2650000, 'Disponible', 2, 110, 'm2',
+      (gen_random_uuid(), v_user_id, 'Apartamento Moderna 402', 'Colonia Moderna', 'Apartamento', 2650000, c_disponible, 2, 110, 'm2',
         'Apartamento remodelado en colonia céntrica, a pasos de supermercados y transporte público. Balcón con vista a la calle y closets empotrados en ambas habitaciones.',
         15.5150, -88.0250),
-      (gen_random_uuid(), v_user_id, 'Casa Las Acacias', 'Las Acacias', 'Casa', 2300000, 'Vendida', 3, 210, 'm2',
+      (gen_random_uuid(), v_user_id, 'Casa Las Acacias', 'Las Acacias', 'Casa', 2300000, c_vendida, 3, 210, 'm2',
         'Residencial cerrado con vigilancia privada, áreas verdes comunes y parque infantil. Casa esquinera con doble entrada vehicular.',
         15.5350, -87.9900),
-      (gen_random_uuid(), v_user_id, 'Terreno Merendón Hills', 'Merendón Hills', 'Terreno', 780000, 'Vendida', null, 1500, 'v2',
+      (gen_random_uuid(), v_user_id, 'Terreno Merendón Hills', 'Merendón Hills', 'Terreno', 780000, c_vendida, null, 1500, 'v2',
         'Terreno en las faldas del Merendón con clima fresco y vista a la ciudad, ideal para proyecto residencial exclusivo o casa de descanso.',
         15.5500, -88.0800);
 
@@ -106,23 +111,23 @@ begin
       (gen_random_uuid(), v_user_id, 'Daysi Ramírez', 'Apartamento en El Pedregal',           2000000, 'Contacto',   now() - interval '3 days'),
       (gen_random_uuid(), v_user_id, 'Luis Fajardo',  'Terreno en Rivera Hernández',          900000,  'Contacto',   now() - interval '5 days'),
       (gen_random_uuid(), v_user_id, 'Carlos Mejía',  'Casa 3 hab en Jardines del Valle',     3900000, 'Visita',     now() - interval '8 days'),
-      (gen_random_uuid(), v_user_id, 'Ana Cruz',      'Apartamento amueblado en Col. Moderna', 2200000, 'Visita',     now() - interval '11 days'),
+      (gen_random_uuid(), v_user_id, c_nombre_ana,      'Apartamento amueblado en Col. Moderna', 2200000, 'Visita',     now() - interval '11 days'),
       (gen_random_uuid(), v_user_id, 'Roberto Paz',   'Casa en La Trejo',                     1900000, 'Negociando', now() - interval '18 days'),
-      (gen_random_uuid(), v_user_id, 'Inversiones RG','Local comercial en Río de Piedras',    4400000, 'Cerrado',    now() - interval '30 days');
+      (gen_random_uuid(), v_user_id, c_nombre_rg,'Local comercial en Río de Piedras',    4400000, 'Cerrado',    now() - interval '30 days');
 
     select id into v_cli_daysi   from public.clients where user_id = v_user_id and nombre = 'Daysi Ramírez';
     select id into v_cli_luis    from public.clients where user_id = v_user_id and nombre = 'Luis Fajardo';
     select id into v_cli_carlos  from public.clients where user_id = v_user_id and nombre = 'Carlos Mejía';
-    select id into v_cli_ana     from public.clients where user_id = v_user_id and nombre = 'Ana Cruz';
+    select id into v_cli_ana     from public.clients where user_id = v_user_id and nombre = c_nombre_ana;
     select id into v_cli_roberto from public.clients where user_id = v_user_id and nombre = 'Roberto Paz';
-    select id into v_cli_rg      from public.clients where user_id = v_user_id and nombre = 'Inversiones RG';
+    select id into v_cli_rg      from public.clients where user_id = v_user_id and nombre = c_nombre_rg;
 
     -- Comisiones / operaciones cerradas
     insert into public.deals (user_id, property_id, client_id, cliente_nombre, valor, comision, fecha_cierre)
     values
-      (v_user_id, v_prop_piedras, v_cli_rg,  'Inversiones RG',  4400000, 176000, date '2026-07-15'),
+      (v_user_id, v_prop_piedras, v_cli_rg,  c_nombre_rg,  4400000, 176000, date '2026-07-15'),
       (v_user_id, v_prop_mayab,   null,      'Familia Zelaya',  2300000, 92000,  date '2026-06-10'),
-      (v_user_id, v_prop_aria,    v_cli_ana, 'Ana Cruz',        2150000, 86000,  date '2026-05-20'),
+      (v_user_id, v_prop_aria,    v_cli_ana, c_nombre_ana,        2150000, 86000,  date '2026-05-20'),
       (v_user_id, v_prop_angeles, null,      'M. Discua',       780000,  31200,  date '2026-04-05');
 
     -- Actividad reciente

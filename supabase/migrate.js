@@ -62,7 +62,9 @@ async function main() {
   await client.end();
 }
 
-main().catch(async (e) => {
+try {
+  await main();
+} catch (e) {
   console.error("MIGRATE FAIL:", e.message);
   try {
     await client.end();
@@ -70,4 +72,4 @@ main().catch(async (e) => {
     // conexión ya cerrada
   }
   process.exit(1);
-});
+}
