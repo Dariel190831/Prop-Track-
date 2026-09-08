@@ -299,6 +299,7 @@
                       <div style="display:flex; align-items:center; gap:6px; flex:none">
                         <span style="{{ p.badge }}">{{ p.est }}</span>
                         <span onClick="{{ p.editar }}" onKeyDown="{{ p.editarKey }}" role="button" tabIndex="0" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
+                        <span onClick="{{ p.eliminar }}" onKeyDown="{{ p.eliminarKey }}" role="button" tabIndex="0" title="Eliminar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#B4553C; background:rgba(180,85,60,.12)">✕</span>
                       </div>
                     </div>
                     <div style="font-size:12.5px; color:#6B7480; margin-top:4px">{{ p.z }}</div>
@@ -348,7 +349,13 @@
               <div style="display:flex; flex-direction:column; gap:10px">
                 <sc-for list="{{ col.cards }}" as="c" hint-placeholder-count="2">
                   <div style="background:#EFEAE0; border-radius:12px; padding:14px 15px" style-hover="background:#E7E0D3">
-                    <div style="font-size:13.5px; font-weight:600">{{ c.n }}</div>
+                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px">
+                      <div style="font-size:13.5px; font-weight:600">{{ c.n }}</div>
+                      <div style="display:flex; align-items:center; gap:4px; flex:none">
+                        <span onClick="{{ c.editar }}" onKeyDown="{{ c.editarKey }}" role="button" tabIndex="0" title="Editar cliente" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
+                        <span onClick="{{ c.eliminar }}" onKeyDown="{{ c.eliminarKey }}" role="button" tabIndex="0" title="Eliminar cliente" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#B4553C; background:rgba(180,85,60,.12)">✕</span>
+                      </div>
+                    </div>
                     <div style="font-size:12px; color:#6B7480; margin-top:3px; line-height:1.4">{{ c.busca }}</div>
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-top:11px">
                       <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#8A5E1F">{{ c.pres }}</span>
@@ -488,7 +495,7 @@
     <sc-if value="{{ showAddClient }}" hint-placeholder-val="{{ false }}">
       <div style="position:fixed; inset:0; background:rgba(16,31,43,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:24px">
         <div style="background:#FBF9F5; border-radius:18px; padding:28px 30px; width:100%; max-width:420px; box-shadow:0 20px 60px rgba(20,33,43,.3)">
-          <div style="font-family:'Newsreader', serif; font-size:21px; font-weight:600">Nuevo cliente</div>
+          <div style="font-family:'Newsreader', serif; font-size:21px; font-weight:600">{{ ncModalTitle }}</div>
           <div style="display:flex; flex-direction:column; gap:12px; margin-top:18px">
             <label style="display:flex; flex-direction:column; gap:6px">
               <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.1em; color:#6B7480">NOMBRE</span>
@@ -597,7 +604,7 @@ class Component extends DCLogic {
     showAddProp: false, savingProp: false, npError: "", npEditId: null,
     npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
     npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: "",
-    showAddClient: false, savingClient: false, ncError: "",
+    showAddClient: false, savingClient: false, ncError: "", ncEditId: null,
     ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto"
   };
   mapEl = null;
@@ -727,19 +734,46 @@ class Component extends DCLogic {
     if (!userId) return;
     if (!s.ncNombre.trim()) return this.setState({ ncError: "Ingresá el nombre del cliente." });
     this.setState({ savingClient: true, ncError: "" });
-    const { error } = await sb.from("clients").insert({
-      user_id: userId,
+    const payload = {
       nombre: s.ncNombre.trim(),
       busca: s.ncBusca.trim() || null,
       presupuesto: s.ncPresupuesto ? Number(s.ncPresupuesto) : null,
       etapa: s.ncEtapa
-    });
+    };
+    const { error } = s.ncEditId
+      ? await sb.from("clients").update(payload).eq("id", s.ncEditId)
+      : await sb.from("clients").insert({ user_id: userId, ...payload });
     if (error) return this.setState({ savingClient: false, ncError: "No se pudo guardar: " + error.message });
     this.setState({
-      savingClient: false, showAddClient: false,
+      savingClient: false, showAddClient: false, ncEditId: null,
       ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto"
     });
     this.loadAll(userId);
+  }
+
+  async eliminarProp(id, titulo) {
+    if (!window.confirm(`¿Eliminar la propiedad "${titulo}"? Esta acción no se puede deshacer.`)) return;
+    const userId = this.state.session && this.state.session.user && this.state.session.user.id;
+    const { error } = await sb.from("properties").delete().eq("id", id);
+    if (error) return window.alert("No se pudo eliminar: " + error.message);
+    if (userId) this.loadAll(userId);
+  }
+
+  abrirEditarCliente(c) {
+    this.setState({
+      showAddClient: true, ncError: "", ncEditId: c.id,
+      ncNombre: c.nombre || "", ncBusca: c.busca || "",
+      ncPresupuesto: c.presupuesto != null ? String(c.presupuesto) : "",
+      ncEtapa: c.etapa || "Contacto"
+    });
+  }
+
+  async eliminarCliente(id, nombre) {
+    if (!window.confirm(`¿Eliminar a "${nombre}"? Esta acción no se puede deshacer.`)) return;
+    const userId = this.state.session && this.state.session.user && this.state.session.user.id;
+    const { error } = await sb.from("clients").delete().eq("id", id);
+    if (error) return window.alert("No se pudo eliminar: " + error.message);
+    if (userId) this.loadAll(userId);
   }
 
   // Enter en el buscador: no filtra solo la pantalla actual, salta a donde
@@ -815,10 +849,15 @@ class Component extends DCLogic {
         const raw = (this.state.properties || []).find(x => x.id === p.id);
         if (raw) this.abrirEditarProp(raw);
       };
+      const eliminar = e => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        this.eliminarProp(p.id, p.t);
+      };
       return {
         ...p,
         go, goKey: this.onEnterKey(go),
         editar, editarKey: this.onEnterKey(() => editar(null)),
+        eliminar, eliminarKey: this.onEnterKey(() => eliminar(null)),
         cardStyle: `background:#FBF9F5; border:1px solid ${this.state.activa === p.id ? "rgba(192,138,62,.75)" : "rgba(20,33,43,.08)"}; border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s ease`,
         badge: `font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 8px; border-radius:99px; white-space:nowrap; color:${col[p.est]}; background:${col[p.est]}1f`,
         expandido: this.state.activa === p.id,
@@ -1008,11 +1047,23 @@ class Component extends DCLogic {
         const cards = (this.state.clients || [])
           .filter(c => c.etapa === etapa)
           .filter(c => !q || c.nombre.toLowerCase().includes(q) || (c.busca || "").toLowerCase().includes(q))
-          .map(c => ({
-            n: c.nombre, busca: c.busca || "",
-            pres: fmtL(c.presupuesto),
-            dias: etapa === "Cerrado" ? "cerrado" : fmtDias(c.created_at)
-          }));
+          .map(c => {
+            const editar = e => {
+              if (e && e.stopPropagation) e.stopPropagation();
+              this.abrirEditarCliente(c);
+            };
+            const eliminar = e => {
+              if (e && e.stopPropagation) e.stopPropagation();
+              this.eliminarCliente(c.id, c.nombre);
+            };
+            return {
+              id: c.id, n: c.nombre, busca: c.busca || "",
+              pres: fmtL(c.presupuesto),
+              dias: etapa === "Cerrado" ? "cerrado" : fmtDias(c.created_at),
+              editar, editarKey: this.onEnterKey(() => editar(null)),
+              eliminar, eliminarKey: this.onEnterKey(() => eliminar(null))
+            };
+          });
         return { label: etapa, n: String(cards.length), cards };
       }),
       comKpis, bars, rows,
@@ -1049,11 +1100,12 @@ class Component extends DCLogic {
       guardarNuevaPropKey: this.onEnterKey(() => this.guardarNuevaProp()),
 
       showAddClient: st.showAddClient,
-      abrirNuevoCliente: () => this.setState({ showAddClient: true, ncError: "" }),
-      abrirNuevoClienteKey: this.onEnterKey(() => this.setState({ showAddClient: true, ncError: "" })),
-      cerrarNuevoCliente: () => this.setState({ showAddClient: false, ncError: "" }),
-      cerrarNuevoClienteKey: this.onEnterKey(() => this.setState({ showAddClient: false, ncError: "" })),
-      ncGuardarLabel: st.savingClient ? "Guardando…" : "Guardar cliente",
+      abrirNuevoCliente: () => this.setState({ showAddClient: true, ncError: "", ncEditId: null, ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto" }),
+      abrirNuevoClienteKey: this.onEnterKey(() => this.setState({ showAddClient: true, ncError: "", ncEditId: null, ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto" })),
+      cerrarNuevoCliente: () => this.setState({ showAddClient: false, ncError: "", ncEditId: null }),
+      cerrarNuevoClienteKey: this.onEnterKey(() => this.setState({ showAddClient: false, ncError: "", ncEditId: null })),
+      ncModalTitle: st.ncEditId ? "Editar cliente" : "Nuevo cliente",
+      ncGuardarLabel: st.savingClient ? "Guardando…" : (st.ncEditId ? "Guardar cambios" : "Guardar cliente"),
       ncGuardarStyle: `flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; ${st.savingClient ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
       ncError: st.ncError,
       ncNombre: st.ncNombre, setNcNombre: e => this.setState({ ncNombre: e.target.value }),

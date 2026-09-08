@@ -2,7 +2,7 @@
 // solo para archivos estaticos del propio sitio. Nunca intercepta
 // llamadas a Supabase (otro origen) ni metodos distintos de GET, para
 // no interferir con la autenticacion ni los datos en vivo de la app.
-const CACHE_NAME = "proptrack-v1";
+const CACHE_NAME = "proptrack-v2";
 const PRECACHE_URLS = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
