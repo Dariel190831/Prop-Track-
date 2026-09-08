@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PropTrack</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -40,7 +41,7 @@
       <div style="width:100%; max-width:380px">
         <div style="display:flex; background:#E4DDCE; border-radius:99px; padding:4px; gap:4px">
           <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
-            <div onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</div>
+            <div onClick="{{ t.go }}" onKeyDown="{{ t.goKey }}" tabIndex="0" style="{{ t.style }}">{{ t.label }}</div>
           </sc-for>
         </div>
 
@@ -64,7 +65,7 @@
             <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#6B7480">CONTRASEÑA</span>
             <div style="position:relative; display:flex; align-items:center">
               <input value="{{ clave }}" onChange="{{ setClave }}" type="{{ claveType }}" placeholder="••••••••" style="flex:1; border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 62px 12px 14px; font-family:'Work Sans', sans-serif; font-size:14px; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
-              <span onClick="{{ toggleClave }}" style="position:absolute; right:12px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; color:#8A5E1F; cursor:pointer">{{ claveLabel }}</span>
+              <span onClick="{{ toggleClave }}" onKeyDown="{{ toggleClaveKey }}" tabIndex="0" style="position:absolute; right:12px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.08em; color:#8A5E1F; cursor:pointer">{{ claveLabel }}</span>
             </div>
           </label>
 
@@ -72,7 +73,7 @@
             <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:10px; padding:10px 13px; font-size:12.5px; color:#8E3E29">{{ authMsgText }}</div>
           </sc-if>
 
-          <div onClick="{{ entrar }}" style="{{ authCtaStyle }}" style-hover="background:#1B3040">{{ authCta }}</div>
+          <div onClick="{{ entrar }}" onKeyDown="{{ entrarKey }}" tabIndex="0" style="{{ authCtaStyle }}" style-hover="background:#1B3040">{{ authCta }}</div>
 
           <div style="display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:#6B7480">
             <span style="cursor:pointer" style-hover="color:#8A5E1F">¿Olvidaste tu contraseña?</span>
@@ -95,7 +96,7 @@
 
       <div class="pt-kpis3" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:32px; align-items:stretch">
         <sc-for list="{{ planes }}" as="p" hint-placeholder-count="3">
-          <div onClick="{{ p.go }}" style="{{ p.style }}">
+          <div onClick="{{ p.go }}" onKeyDown="{{ p.goKey }}" tabIndex="0" style="{{ p.style }}">
             <div style="display:flex; align-items:center; justify-content:space-between">
               <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:{{ p.metaColor }}">{{ p.tag }}</span>
               <span style="{{ p.radio }}"></span>
@@ -141,8 +142,8 @@
             <span style="font-family:'Newsreader', serif; font-size:26px">$0.00</span>
           </div>
           <div style="font-size:11.5px; color:#8B939C; margin-top:8px; line-height:1.5">Luego {{ planPrecio }} {{ planPeriodo }} a partir del {{ fechaPrueba }}.</div>
-          <div onClick="{{ activar }}" style="background:#C08A3E; color:#101F2B; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#D19B4C">Activar suscripción</div>
-          <div onClick="{{ salir }}" style="text-align:center; font-size:12.5px; color:#6B7480; margin-top:12px; cursor:pointer" style-hover="color:#8A5E1F">Volver al inicio de sesión</div>
+          <div onClick="{{ activar }}" onKeyDown="{{ activarKey }}" tabIndex="0" style="background:#C08A3E; color:#101F2B; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#D19B4C">Activar suscripción</div>
+          <div onClick="{{ salir }}" onKeyDown="{{ salirKey }}" tabIndex="0" style="text-align:center; font-size:12.5px; color:#6B7480; margin-top:12px; cursor:pointer" style-hover="color:#8A5E1F">Volver al inicio de sesión</div>
         </div>
       </div>
     </div>
@@ -160,7 +161,7 @@
 
     <nav style="display:flex; flex-direction:column; gap:4px; margin-top:22px">
       <sc-for list="{{ nav }}" as="item" hint-placeholder-count="4">
-        <div onClick="{{ item.go }}" style="{{ item.style }}" style-hover="background:rgba(244,240,232,.09)">
+        <div onClick="{{ item.go }}" onKeyDown="{{ item.goKey }}" tabIndex="0" style="{{ item.style }}" style-hover="background:rgba(244,240,232,.09)">
           <span style="width:22px; text-align:center; font-size:15px; opacity:.9">{{ item.icon }}</span>
           <span style="font-size:14.5px; font-weight:500">{{ item.label }}</span>
         </div>
@@ -181,7 +182,7 @@
           <div style="font-size:13.5px; font-weight:600">{{ nombreCuenta }}</div>
           <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8FA3B2">Plan {{ planNombre }} · $7/mes</div>
         </div>
-        <span onClick="{{ salir }}" title="Cerrar sesión" style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8FA3B2; cursor:pointer" style-hover="color:#C08A3E">SALIR</span>
+        <span onClick="{{ salir }}" onKeyDown="{{ salirKey }}" tabIndex="0" title="Cerrar sesión" style="font-family:'JetBrains Mono', monospace; font-size:10px; color:#8FA3B2; cursor:pointer" style-hover="color:#C08A3E">SALIR</span>
       </div>
     </div>
   </aside>
@@ -196,7 +197,8 @@
       <div style="display:flex; align-items:center; gap:18px">
         <div style="display:flex; align-items:center; background:#EFEAE0; border-radius:99px; padding:8px 16px; gap:9px; min-width:250px">
           <span style="opacity:.45; font-size:13px">⌕</span>
-          <input value="{{ busqueda }}" onChange="{{ setBusqueda }}" onKeyDown="{{ onBusquedaKeyDown }}" placeholder="Buscar propiedad, cliente o zona (Enter)" style="border:none; background:transparent; outline:none; font-family:'Work Sans', sans-serif; font-size:13px; width:100%; color:#14212B">
+          <label for="busqueda-global" style="position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0">Buscar propiedad, cliente o zona</label>
+          <input id="busqueda-global" value="{{ busqueda }}" onChange="{{ setBusqueda }}" onKeyDown="{{ onBusquedaKeyDown }}" placeholder="Buscar propiedad, cliente o zona (Enter)" style="border:none; background:transparent; outline:none; font-family:'Work Sans', sans-serif; font-size:13px; width:100%; color:#14212B">
         </div>
         <span style="font-family:'JetBrains Mono', monospace; font-size:11.5px; color:#6B7480">{{ fechaHoy }}</span>
       </div>
@@ -205,7 +207,7 @@
     <sc-if value="{{ loadError }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 40px; background:#B4553C1a; border-bottom:1px solid #B4553C55; font-size:13px; color:#8E3E29">
         <span>No se pudieron cargar algunos datos. Puede ser un problema de conexión pasajero.</span>
-        <span onClick="{{ reintentar }}" style="font-weight:600; cursor:pointer; white-space:nowrap" style-hover="color:#B4553C">Reintentar →</span>
+        <span onClick="{{ reintentar }}" onKeyDown="{{ reintentarKey }}" tabIndex="0" style="font-weight:600; cursor:pointer; white-space:nowrap" style-hover="color:#B4553C">Reintentar →</span>
       </div>
     </sc-if>
 
@@ -250,7 +252,7 @@
                 </div>
               </sc-for>
             </div>
-            <div onClick="{{ goClientes }}" style="margin-top:18px; font-size:13.5px; font-weight:600; color:#8A5E1F; cursor:pointer">Ver todos los clientes →</div>
+            <div onClick="{{ goClientes }}" onKeyDown="{{ goClientesKey }}" tabIndex="0" style="margin-top:18px; font-size:13.5px; font-weight:600; color:#8A5E1F; cursor:pointer">Ver todos los clientes →</div>
           </div>
 
           <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:18px; padding:24px 26px">
@@ -278,15 +280,15 @@
             <div style="font-family:'Newsreader', serif; font-size:26px; font-weight:600">Propiedades</div>
             <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#6B7480">{{ propsCount }}</span>
           </div>
-          <div onClick="{{ abrirNuevaProp }}" style="margin-top:14px; background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px; text-align:center; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">+ Agregar propiedad</div>
+          <div onClick="{{ abrirNuevaProp }}" onKeyDown="{{ abrirNuevaPropKey }}" tabIndex="0" style="margin-top:14px; background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px; text-align:center; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">+ Agregar propiedad</div>
           <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
             <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
-              <div onClick="{{ f.go }}" style="{{ f.style }}">{{ f.label }}</div>
+              <div onClick="{{ f.go }}" onKeyDown="{{ f.goKey }}" tabIndex="0" style="{{ f.style }}">{{ f.label }}</div>
             </sc-for>
           </div>
           <div style="display:flex; flex-direction:column; gap:12px; margin-top:18px">
             <sc-for list="{{ propsList }}" as="p" hint-placeholder-count="5">
-              <div onClick="{{ p.go }}" style="{{ p.cardStyle }}" style-hover="border-color:rgba(192,138,62,.55)">
+              <div onClick="{{ p.go }}" onKeyDown="{{ p.goKey }}" tabIndex="0" style="{{ p.cardStyle }}" style-hover="border-color:rgba(192,138,62,.55)">
                 <div style="display:flex; gap:14px">
                   <div style="width:74px; height:74px; border-radius:10px; flex:none; background:repeating-linear-gradient(135deg,#E4DDCE,#E4DDCE 6px,#EFEAE0 6px,#EFEAE0 12px); display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px">
                     <span style="font-family:'JetBrains Mono', monospace; font-size:8px; color:#8B939C">FOTO</span>
@@ -296,7 +298,7 @@
                       <div style="font-size:14.5px; font-weight:600; line-height:1.3">{{ p.t }}</div>
                       <div style="display:flex; align-items:center; gap:6px; flex:none">
                         <span style="{{ p.badge }}">{{ p.est }}</span>
-                        <span onClick="{{ p.editar }}" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
+                        <span onClick="{{ p.editar }}" onKeyDown="{{ p.editarKey }}" tabIndex="0" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
                       </div>
                     </div>
                     <div style="font-size:12.5px; color:#6B7480; margin-top:4px">{{ p.z }}</div>
@@ -314,7 +316,7 @@
           </div>
         </div>
         <div style="position:relative; background:#E8E2D6">
-          <iframe class="pt-map-frame" ref="{{ mapRef }}" src="./mapa.html" style="width:100%; height:calc(100vh - 69px); border:none; display:block"></iframe>
+          <iframe class="pt-map-frame" ref="{{ mapRef }}" src="./mapa.html" title="Mapa de propiedades" style="width:100%; height:calc(100vh - 69px); border:none; display:block"></iframe>
           <div style="position:absolute; bottom:18px; left:18px; background:#FBF9F5; border:1px solid rgba(20,33,43,.1); border-radius:12px; padding:12px 16px; box-shadow:0 6px 20px rgba(20,33,43,.12); display:flex; flex-direction:column; gap:8px">
             <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#8B939C">ESTADO</div>
             <sc-for list="{{ leyenda }}" as="l" hint-placeholder-count="3">
@@ -334,7 +336,7 @@
             <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">Clientes</div>
             <div style="color:#5E6771; font-size:14.5px; margin-top:5px">Seguimiento del embudo, de primer contacto a cierre.</div>
           </div>
-          <div onClick="{{ abrirNuevoCliente }}" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
+          <div onClick="{{ abrirNuevoCliente }}" onKeyDown="{{ abrirNuevoClienteKey }}" tabIndex="0" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
         </div>
         <div class="pt-pipeline" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:26px; align-items:start">
           <sc-for list="{{ pipeline }}" as="col" hint-placeholder-count="4">
@@ -475,8 +477,8 @@
               <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:9px; padding:9px 12px; font-size:12.5px; color:#8E3E29">{{ npError }}</div>
             </sc-if>
             <div style="display:flex; gap:10px; margin-top:8px">
-              <div onClick="{{ cerrarNuevaProp }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
-              <div onClick="{{ guardarNuevaProp }}" style="{{ npGuardarStyle }}" style-hover="background:#1B3040">{{ npGuardarLabel }}</div>
+              <div onClick="{{ cerrarNuevaProp }}" onKeyDown="{{ cerrarNuevaPropKey }}" tabIndex="0" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
+              <div onClick="{{ guardarNuevaProp }}" onKeyDown="{{ guardarNuevaPropKey }}" tabIndex="0" style="{{ npGuardarStyle }}" style-hover="background:#1B3040">{{ npGuardarLabel }}</div>
             </div>
           </div>
         </div>
@@ -515,8 +517,8 @@
               <div style="background:#B4553C1a; border:1px solid #B4553C55; border-radius:9px; padding:9px 12px; font-size:12.5px; color:#8E3E29">{{ ncError }}</div>
             </sc-if>
             <div style="display:flex; gap:10px; margin-top:8px">
-              <div onClick="{{ cerrarNuevoCliente }}" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
-              <div onClick="{{ guardarNuevoCliente }}" style="{{ ncGuardarStyle }}" style-hover="background:#1B3040">{{ ncGuardarLabel }}</div>
+              <div onClick="{{ cerrarNuevoCliente }}" onKeyDown="{{ cerrarNuevoClienteKey }}" tabIndex="0" style="flex:1; text-align:center; padding:12px; border-radius:9px; border:1px solid rgba(20,33,43,.16); font-size:13.5px; font-weight:600; cursor:pointer; color:#5E6771">Cancelar</div>
+              <div onClick="{{ guardarNuevoCliente }}" onKeyDown="{{ guardarNuevoClienteKey }}" tabIndex="0" style="{{ ncGuardarStyle }}" style-hover="background:#1B3040">{{ ncGuardarLabel }}</div>
             </div>
           </div>
         </div>
@@ -601,6 +603,12 @@ class Component extends DCLogic {
   mapEl = null;
 
   post(msg) { if (this.mapEl && this.mapEl.contentWindow) this.mapEl.contentWindow.postMessage(msg, "*"); }
+
+  // Equivalente de teclado para los elementos clicables (div/span usados como
+  // botón): activa la misma acción con Enter o Espacio, para accesibilidad.
+  onEnterKey(fn) {
+    return e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(e); } };
+  }
 
   async componentDidMount() {
     const { data } = await sb.auth.getSession();
@@ -776,10 +784,13 @@ class Component extends DCLogic {
       ["resumen", "Resumen", "◈"], ["props", "Propiedades", "⌂"],
       ["clientes", "Clientes", "◍"], ["comisiones", "Comisiones", "▤"]
     ];
-    const nav = items.map(([id, label, icon]) => ({
-      label, icon, go: () => this.setState({ screen: id }),
-      style: `display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px; cursor:pointer; transition:background .15s ease; color:${s === id ? "#101F2B" : "#C9D2DA"}; background:${s === id ? "#F4F0E8" : "transparent"}; font-weight:${s === id ? 600 : 500}`
-    }));
+    const nav = items.map(([id, label, icon]) => {
+      const go = () => this.setState({ screen: id });
+      return {
+        label, icon, go, goKey: this.onEnterKey(go),
+        style: `display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px; cursor:pointer; transition:background .15s ease; color:${s === id ? "#101F2B" : "#C9D2DA"}; background:${s === id ? "#F4F0E8" : "transparent"}; font-weight:${s === id ? 600 : 500}`
+      };
+    });
 
     const propsData = (this.state.properties || []).map(p => ({
       id: p.id, t: p.titulo, z: p.zona, p: fmtL(p.precio), est: p.estado, tipo: p.tipo,
@@ -788,25 +799,32 @@ class Component extends DCLogic {
     }));
     const col = { Disponible: GREEN, Negociando: GOLD, Vendida: RED };
     const f = this.state.filtro;
-    const filtros = ["Todas", "Casa", "Apartamento", "Terreno", "Local"].map(label => ({
-      label, go: () => this.setState({ filtro: label }),
-      style: `font-family:'JetBrains Mono', monospace; font-size:11px; padding:7px 13px; border-radius:99px; cursor:pointer; border:1px solid ${f === label ? "#101F2B" : "rgba(20,33,43,.16)"}; background:${f === label ? "#101F2B" : "transparent"}; color:${f === label ? "#F4F0E8" : "#5E6771"}`
-    }));
+    const filtros = ["Todas", "Casa", "Apartamento", "Terreno", "Local"].map(label => {
+      const go = () => this.setState({ filtro: label });
+      return {
+        label, go, goKey: this.onEnterKey(go),
+        style: `font-family:'JetBrains Mono', monospace; font-size:11px; padding:7px 13px; border-radius:99px; cursor:pointer; border:1px solid ${f === label ? "#101F2B" : "rgba(20,33,43,.16)"}; background:${f === label ? "#101F2B" : "transparent"}; color:${f === label ? "#F4F0E8" : "#5E6771"}`
+      };
+    });
 
     const q = (this.state.busqueda || "").trim().toLowerCase();
-    const propsList = propsData.filter(p => (f === "Todas" || p.tipo === f) && (!q || p.t.toLowerCase().includes(q) || (p.z || "").toLowerCase().includes(q))).map(p => ({
-      ...p,
-      go: () => { this.setState({ activa: this.state.activa === p.id ? null : p.id }); this.post({ type: "focus", id: p.id }); },
-      editar: e => {
+    const propsList = propsData.filter(p => (f === "Todas" || p.tipo === f) && (!q || p.t.toLowerCase().includes(q) || (p.z || "").toLowerCase().includes(q))).map(p => {
+      const go = () => { this.setState({ activa: this.state.activa === p.id ? null : p.id }); this.post({ type: "focus", id: p.id }); };
+      const editar = e => {
         if (e && e.stopPropagation) e.stopPropagation();
         const raw = (this.state.properties || []).find(x => x.id === p.id);
         if (raw) this.abrirEditarProp(raw);
-      },
-      cardStyle: `background:#FBF9F5; border:1px solid ${this.state.activa === p.id ? "rgba(192,138,62,.75)" : "rgba(20,33,43,.08)"}; border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s ease`,
-      badge: `font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 8px; border-radius:99px; white-space:nowrap; color:${col[p.est]}; background:${col[p.est]}1f`,
-      expandido: this.state.activa === p.id,
-      descripcionTexto: p.descripcion || "Sin descripción disponible."
-    }));
+      };
+      return {
+        ...p,
+        go, goKey: this.onEnterKey(go),
+        editar, editarKey: this.onEnterKey(() => editar(null)),
+        cardStyle: `background:#FBF9F5; border:1px solid ${this.state.activa === p.id ? "rgba(192,138,62,.75)" : "rgba(20,33,43,.08)"}; border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s ease`,
+        badge: `font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 8px; border-radius:99px; white-space:nowrap; color:${col[p.est]}; background:${col[p.est]}1f`,
+        expandido: this.state.activa === p.id,
+        descripcionTexto: p.descripcion || "Sin descripción disponible."
+      };
+    });
 
     const st = this.state;
     const registro = st.modo === "Registrarme";
@@ -814,14 +832,67 @@ class Component extends DCLogic {
       { id: "mensual", nombre: "Mensual", precio: "$7", periodo: "/ mes", tag: "MÁS ELEGIDO", nota: "Todas las funciones, propiedades ilimitadas y mapa en vivo." },
       { id: "anual", nombre: "Anual", precio: "$70", periodo: "/ año", tag: "AHORRÁS 2 MESES", nota: "El mismo plan mensual con dos meses de regalo." },
       { id: "equipo", nombre: "Equipo", precio: "$5", periodo: "/ agente / mes", tag: "DESDE 3 AGENTES", nota: "Cartera compartida y comisiones por agente." }
-    ].map(p => ({
-      ...p,
-      go: () => this.setState({ plan: p.id }),
-      metaColor: st.plan === p.id ? "#8A5E1F" : "#8B939C",
-      style: `background:${st.plan === p.id ? "#FBF9F5" : "transparent"}; border:1px solid ${st.plan === p.id ? "rgba(192,138,62,.8)" : "rgba(20,33,43,.14)"}; border-radius:16px; padding:22px; cursor:pointer; transition:border-color .15s ease, background .15s ease`,
-      radio: `width:16px; height:16px; border-radius:50%; display:inline-block; border:${st.plan === p.id ? "5px solid #C08A3E" : "1.5px solid rgba(20,33,43,.25)"}`
-    }));
+    ].map(p => {
+      const go = () => this.setState({ plan: p.id });
+      return {
+        ...p,
+        go, goKey: this.onEnterKey(go),
+        metaColor: st.plan === p.id ? "#8A5E1F" : "#8B939C",
+        style: `background:${st.plan === p.id ? "#FBF9F5" : "transparent"}; border:1px solid ${st.plan === p.id ? "rgba(192,138,62,.8)" : "rgba(20,33,43,.14)"}; border-radius:16px; padding:22px; cursor:pointer; transition:border-color .15s ease, background .15s ease`,
+        radio: `width:16px; height:16px; border-radius:50%; display:inline-block; border:${st.plan === p.id ? "5px solid #C08A3E" : "1.5px solid rgba(20,33,43,.25)"}`
+      };
+    });
     const planActual = planes.find(p => p.id === st.plan) || planes[0];
+
+    const toggleClave = () => this.setState({ verClave: !st.verClave });
+
+    const entrar = async () => {
+      if (st.loading) return; // evita doble clic mientras ya hay un intento en curso
+      if (!st.usuario.trim() || !st.clave.trim()) return this.setState({ error: true });
+      this.setState({ loading: true, error: false, authMsg: "" });
+      if (registro) {
+        const { data, error } = await sb.auth.signUp({
+          email: st.usuario.trim(), password: st.clave,
+          options: { data: { nombre: st.nombre.trim() || st.usuario.trim() } }
+        });
+        if (error) return this.setState({ loading: false, error: true, authMsg: error.message });
+        if (data.session) {
+          this.setState({ loading: false, session: data.session, vista: "pago" });
+        } else {
+          this.setState({ loading: false, error: true, authMsg: "Cuenta creada. Revisá tu correo para confirmarla y luego iniciá sesión." });
+        }
+      } else {
+        const email = st.usuario.trim();
+        const { data: exists, error: checkErr } = await sb.rpc("email_exists", { p_email: email });
+        if (!checkErr && exists === false) {
+          return this.setState({
+            loading: false, error: true, modo: "Registrarme",
+            authMsg: "Ese usuario no está registrado. Por favor registrate para poder continuar."
+          });
+        }
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: st.clave });
+        if (error) return this.setState({ loading: false, error: true, authMsg: "Usuario o contraseña incorrectos." });
+        this.setState({ loading: false, session: data.session, vista: "app", clave: "" });
+        this.loadAll(data.session.user.id);
+      }
+    };
+
+    const activar = async () => {
+      const userId = st.session && st.session.user && st.session.user.id;
+      if (userId) await sb.from("profiles").update({ plan: st.plan }).eq("id", userId);
+      this.setState({ vista: "app", screen: "resumen" });
+      if (userId) this.loadAll(userId);
+    };
+
+    const salir = async () => {
+      const userId = st.session && st.session.user && st.session.user.id;
+      await sb.auth.signOut();
+      if (userId) clearCache(userId);
+      this.setState({
+        vista: "login", modo: "Ingresar", clave: "", error: false, authMsg: "",
+        session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: [], kpiRow: null, mesesRow: []
+      });
+    };
 
     const auth = {
       isLogin: st.vista === "login", isPago: st.vista === "pago", isApp: st.vista === "app",
@@ -830,10 +901,14 @@ class Component extends DCLogic {
       authSub: registro ? "14 días gratis, sin cargo hasta el día 15." : "Ingresá con tu usuario y contraseña.",
       authCta: st.loading ? "Un momento…" : (registro ? "Continuar al pago" : "Entrar a PropTrack"),
       authCtaStyle: `background:#101F2B; color:#F4F0E8; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; margin-top:4px; ${st.loading ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
-      tabs: ["Ingresar", "Registrarme"].map(label => ({
-        label, go: () => this.setState({ modo: label, error: false }),
-        style: `flex:1; text-align:center; padding:9px; border-radius:99px; font-size:13.5px; font-weight:600; cursor:pointer; background:${st.modo === label ? "#FBF9F5" : "transparent"}; color:${st.modo === label ? "#14212B" : "#6B7480"}`
-      })),
+      entrarKey: this.onEnterKey(entrar),
+      tabs: ["Ingresar", "Registrarme"].map(label => {
+        const go = () => this.setState({ modo: label, error: false });
+        return {
+          label, go, goKey: this.onEnterKey(go),
+          style: `flex:1; text-align:center; padding:9px; border-radius:99px; font-size:13.5px; font-weight:600; cursor:pointer; background:${st.modo === label ? "#FBF9F5" : "transparent"}; color:${st.modo === label ? "#14212B" : "#6B7480"}`
+        };
+      }),
       ventajas: [{ n: "6", l: "PROPIEDADES" }, { n: "IA", l: "EMPAREJAMIENTO" }, { n: "14 d", l: "GRATIS" }],
       nombre: st.nombre, usuario: st.usuario, clave: st.clave,
       setNombre: e => this.setState({ nombre: e.target.value }),
@@ -841,54 +916,12 @@ class Component extends DCLogic {
       setClave: e => this.setState({ clave: e.target.value, error: false }),
       claveType: st.verClave ? "text" : "password",
       claveLabel: st.verClave ? "OCULTAR" : "VER",
-      toggleClave: () => this.setState({ verClave: !st.verClave }),
+      toggleClave, toggleClaveKey: this.onEnterKey(toggleClave),
       mostrarError: st.error,
       authMsgText: st.authMsg || "Ingresá usuario y contraseña para continuar.",
-      entrar: async () => {
-        if (st.loading) return; // evita doble clic mientras ya hay un intento en curso
-        if (!st.usuario.trim() || !st.clave.trim()) return this.setState({ error: true });
-        this.setState({ loading: true, error: false, authMsg: "" });
-        if (registro) {
-          const { data, error } = await sb.auth.signUp({
-            email: st.usuario.trim(), password: st.clave,
-            options: { data: { nombre: st.nombre.trim() || st.usuario.trim() } }
-          });
-          if (error) return this.setState({ loading: false, error: true, authMsg: error.message });
-          if (data.session) {
-            this.setState({ loading: false, session: data.session, vista: "pago" });
-          } else {
-            this.setState({ loading: false, error: true, authMsg: "Cuenta creada. Revisá tu correo para confirmarla y luego iniciá sesión." });
-          }
-        } else {
-          const email = st.usuario.trim();
-          const { data: exists, error: checkErr } = await sb.rpc("email_exists", { p_email: email });
-          if (!checkErr && exists === false) {
-            return this.setState({
-              loading: false, error: true, modo: "Registrarme",
-              authMsg: "Ese usuario no está registrado. Por favor registrate para poder continuar."
-            });
-          }
-          const { data, error } = await sb.auth.signInWithPassword({ email, password: st.clave });
-          if (error) return this.setState({ loading: false, error: true, authMsg: "Usuario o contraseña incorrectos." });
-          this.setState({ loading: false, session: data.session, vista: "app", clave: "" });
-          this.loadAll(data.session.user.id);
-        }
-      },
-      activar: async () => {
-        const userId = st.session && st.session.user && st.session.user.id;
-        if (userId) await sb.from("profiles").update({ plan: st.plan }).eq("id", userId);
-        this.setState({ vista: "app", screen: "resumen" });
-        if (userId) this.loadAll(userId);
-      },
-      salir: async () => {
-        const userId = st.session && st.session.user && st.session.user.id;
-        await sb.auth.signOut();
-        if (userId) clearCache(userId);
-        this.setState({
-          vista: "login", modo: "Ingresar", clave: "", error: false, authMsg: "",
-          session: null, profile: null, properties: [], clients: [], deals: [], activities: [], matches: [], kpiRow: null, mesesRow: []
-        });
-      },
+      entrar,
+      activar, activarKey: this.onEnterKey(activar),
+      salir, salirKey: this.onEnterKey(salir),
       planes, planNombre: planActual.nombre, planPrecio: planActual.precio, planPeriodo: planActual.periodo,
       nombreCuenta: (st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel Mencía",
       fechaPrueba: fmtFecha(new Date(Date.now() + 14 * 86400000))
@@ -957,9 +990,11 @@ class Component extends DCLogic {
       title: { resumen: "Resumen", props: "Propiedades", clientes: "Clientes", comisiones: "Comisiones" }[s],
       isResumen: s === "resumen", isProps: s === "props", isClientes: s === "clientes", isComisiones: s === "comisiones",
       goClientes: () => this.setState({ screen: "clientes" }),
+      goClientesKey: this.onEnterKey(() => this.setState({ screen: "clientes" })),
       mapRef: el => { this.mapEl = el; },
       loadError: st.loadError,
       reintentar: () => { const uid = st.session && st.session.user && st.session.user.id; if (uid) this.loadAll(uid); },
+      reintentarKey: this.onEnterKey(() => { const uid = st.session && st.session.user && st.session.user.id; if (uid) this.loadAll(uid); }),
       kpis, matches, feed,
       metaCobrado: fmtL(cobrado), metaObjetivo: Math.round(metaObjetivoNum).toLocaleString("en-US"),
       metaBarStyle: `width:${metaPct}%; height:100%; background:#C08A3E; border-radius:99px`,
@@ -988,7 +1023,13 @@ class Component extends DCLogic {
         npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
         npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: ""
       }),
+      abrirNuevaPropKey: this.onEnterKey(() => this.setState({
+        showAddProp: true, npError: "", npEditId: null,
+        npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
+        npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: ""
+      })),
       cerrarNuevaProp: () => this.setState({ showAddProp: false, npError: "", npEditId: null }),
+      cerrarNuevaPropKey: this.onEnterKey(() => this.setState({ showAddProp: false, npError: "", npEditId: null })),
       npModalTitle: st.npEditId ? "Editar propiedad" : "Nueva propiedad",
       npGuardarLabel: st.savingProp ? "Guardando…" : (st.npEditId ? "Guardar cambios" : "Guardar propiedad"),
       npGuardarStyle: `flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; ${st.savingProp ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
@@ -1005,10 +1046,13 @@ class Component extends DCLogic {
       npLat: st.npLat, setNpLat: e => this.setState({ npLat: e.target.value }),
       npLng: st.npLng, setNpLng: e => this.setState({ npLng: e.target.value }),
       guardarNuevaProp: () => this.guardarNuevaProp(),
+      guardarNuevaPropKey: this.onEnterKey(() => this.guardarNuevaProp()),
 
       showAddClient: st.showAddClient,
       abrirNuevoCliente: () => this.setState({ showAddClient: true, ncError: "" }),
+      abrirNuevoClienteKey: this.onEnterKey(() => this.setState({ showAddClient: true, ncError: "" })),
       cerrarNuevoCliente: () => this.setState({ showAddClient: false, ncError: "" }),
+      cerrarNuevoClienteKey: this.onEnterKey(() => this.setState({ showAddClient: false, ncError: "" })),
       ncGuardarLabel: st.savingClient ? "Guardando…" : "Guardar cliente",
       ncGuardarStyle: `flex:1; text-align:center; padding:12px; border-radius:9px; background:#101F2B; color:#F4F0E8; font-size:13.5px; font-weight:600; ${st.savingClient ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
       ncError: st.ncError,
@@ -1016,7 +1060,8 @@ class Component extends DCLogic {
       ncBusca: st.ncBusca, setNcBusca: e => this.setState({ ncBusca: e.target.value }),
       ncPresupuesto: st.ncPresupuesto, setNcPresupuesto: e => this.setState({ ncPresupuesto: e.target.value }),
       ncEtapa: st.ncEtapa, setNcEtapa: e => this.setState({ ncEtapa: e.target.value }),
-      guardarNuevoCliente: () => this.guardarNuevoCliente()
+      guardarNuevoCliente: () => this.guardarNuevoCliente(),
+      guardarNuevoClienteKey: this.onEnterKey(() => this.guardarNuevoCliente())
     };
   }
 }
