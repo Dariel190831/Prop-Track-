@@ -1,4 +1,7 @@
 name: CI
+# Pipeline as code: este archivo vive versionado en el repo (no en un
+# servidor aparte), viaja en cada PR y corre en una maquina limpia por
+# ejecucion (runs-on: ubuntu-latest) para evitar el "en mi maquina funciona".
 
 on:
   push:
