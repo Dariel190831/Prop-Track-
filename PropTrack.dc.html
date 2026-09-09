@@ -593,6 +593,17 @@ const clearCache = userId => {
   try { localStorage.removeItem(cacheKey(userId)); } catch (e) { /* nada que limpiar */ }
 };
 
+// Deep-linking por hash: cada pantalla principal tiene su propia URL
+// (#propiedades, #clientes, #comisiones), asi se puede compartir o
+// abrir un enlace directo a una pantalla especifica del dashboard.
+const HASH_TO_SCREEN = { resumen: "resumen", propiedades: "props", clientes: "clientes", comisiones: "comisiones" };
+const SCREEN_TO_HASH = { resumen: "resumen", props: "propiedades", clientes: "clientes", comisiones: "comisiones" };
+const screenFromHash = () => HASH_TO_SCREEN[(location.hash || "").replace("#", "")] || null;
+const setHashForScreen = screen => {
+  const h = "#" + (SCREEN_TO_HASH[screen] || "resumen");
+  if (location.hash !== h) history.replaceState(null, "", h);
+};
+
 class Component extends DCLogic {
   state = {
     screen: "resumen", filtro: "Todas", activa: null,
@@ -622,7 +633,8 @@ class Component extends DCLogic {
     if (data.session) {
       const userId = data.session.user.id;
       const cached = loadCache(userId);
-      this.setState({ session: data.session, vista: "app", ...(cached || {}) });
+      const screen = screenFromHash() || "resumen";
+      this.setState({ session: data.session, vista: "app", screen, ...(cached || {}) });
       this.loadAll(userId); // revalida en segundo plano aunque haya cache
     }
     sb.auth.onAuthStateChange((event) => {
@@ -787,14 +799,15 @@ class Component extends DCLogic {
     const propMatches = props.filter(p => p.titulo.toLowerCase().includes(q) || (p.zona || "").toLowerCase().includes(q)).length;
     const clientMatches = clients.filter(c => c.nombre.toLowerCase().includes(q) || (c.busca || "").toLowerCase().includes(q)).length;
     const s = this.state.screen;
+    const goTo = screen => { this.setState({ screen }); setHashForScreen(screen); };
     if (clientMatches > 0 && (propMatches === 0 || s === "clientes")) {
-      this.setState({ screen: "clientes" });
+      goTo("clientes");
     } else if (propMatches > 0 && (clientMatches === 0 || s === "props")) {
-      this.setState({ screen: "props" });
+      goTo("props");
     } else if (clientMatches > 0) {
-      this.setState({ screen: "clientes" });
+      goTo("clientes");
     } else if (propMatches > 0) {
-      this.setState({ screen: "props" });
+      goTo("props");
     }
   }
 
@@ -819,7 +832,7 @@ class Component extends DCLogic {
       ["clientes", "Clientes", "◍"], ["comisiones", "Comisiones", "▤"]
     ];
     const nav = items.map(([id, label, icon]) => {
-      const go = () => this.setState({ screen: id });
+      const go = () => { this.setState({ screen: id }); setHashForScreen(id); };
       return {
         label, icon, go, goKey: this.onEnterKey(go),
         style: `display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px; cursor:pointer; transition:background .15s ease; color:${s === id ? "#101F2B" : "#C9D2DA"}; background:${s === id ? "#F4F0E8" : "transparent"}; font-weight:${s === id ? 600 : 500}`
@@ -911,7 +924,7 @@ class Component extends DCLogic {
         }
         const { data, error } = await sb.auth.signInWithPassword({ email, password: st.clave });
         if (error) return this.setState({ loading: false, error: true, authMsg: "Usuario o contraseña incorrectos." });
-        this.setState({ loading: false, session: data.session, vista: "app", clave: "" });
+        this.setState({ loading: false, session: data.session, vista: "app", clave: "", screen: screenFromHash() || "resumen" });
         this.loadAll(data.session.user.id);
       }
     };
@@ -1028,7 +1041,7 @@ class Component extends DCLogic {
       saludo: `Buen día, ${((st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel").split(" ")[0]}`,
       title: { resumen: "Resumen", props: "Propiedades", clientes: "Clientes", comisiones: "Comisiones" }[s],
       isResumen: s === "resumen", isProps: s === "props", isClientes: s === "clientes", isComisiones: s === "comisiones",
-      goClientes: () => this.setState({ screen: "clientes" }),
+      goClientes: () => { this.setState({ screen: "clientes" }); setHashForScreen("clientes"); },
       goClientesKey: this.onEnterKey(() => this.setState({ screen: "clientes" })),
       mapRef: el => { this.mapEl = el; },
       loadError: st.loadError,
