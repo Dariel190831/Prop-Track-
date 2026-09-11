@@ -62,7 +62,9 @@ jobs:
 
       - run: npm ci --ignore-scripts
 
-      - run: npx playwright install --with-deps chromium
+      # npm run (no npx): usa el binario ya resuelto por npm ci, sin la
+      # instalacion on-demand que npx permite si el paquete no esta local.
+      - run: npm run e2e:install
 
       - name: E2E (Playwright)
         run: npm run test:e2e
