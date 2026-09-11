@@ -16,6 +16,12 @@ dist-ssr
 # coverage-summary.json y lcov.info sí se versionan a propósito.
 coverage/lcov-report/
 
+# Artefactos de Playwright (se regeneran con `npm run test:e2e`)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

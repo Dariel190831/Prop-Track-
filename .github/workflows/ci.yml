@@ -45,3 +45,34 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Job separado y NO requerido por branch protection: la piramide de
+  # testing dice que la base (unitarios, arriba) es rapida y bloquea, pero
+  # la punta (E2E) es lenta y solo informa. Si este job falla o tarda, el
+  # PR sigue siendo mergeable con build-and-test en verde.
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+
+      # npm run (no npx): usa el binario ya resuelto por npm ci, sin la
+      # instalacion on-demand que npx permite si el paquete no esta local.
+      - run: npm run e2e:install
+
+      - name: E2E (Playwright)
+        run: npm run test:e2e
+
+      - name: Subir reporte de Playwright
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
