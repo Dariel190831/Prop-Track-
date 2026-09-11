@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { configDefaults } from 'vitest/config'
 import { cpSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -27,6 +28,10 @@ export default defineConfig({
     },
   },
   test: {
+    // e2e/**: son specs de Playwright (test.describe propio, incompatible
+    // con el test runner de vitest), no unitarios - vitest los recoge por
+    // defecto si no se excluyen explicitamente.
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     // Cobertura acotada al código realmente unit-testeable (ver ADR-002):
     // el prototipo PropTrack.dc.html vive fuera de este alcance a propósito.
     coverage: {
