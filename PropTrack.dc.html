@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha384-iLddHTLokph6Omwoyid4XKxHaWa6w41BnoEj0q5oOrzmYPpHIKt1wyjReA7s//pP" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@3.0.1/dist/jspdf.umd.min.js" integrity="sha384-ytX5osgYad9GPnagB0k+CxKTir/bsE7AfpzvCnQ7owfeWuDd+2l2y0PSIqRK+z/2" crossorigin="anonymous" defer></script>
 <link rel="stylesheet" href="./pt-style.css">
 </helmet>
 
@@ -207,6 +208,13 @@
       </div>
     </header>
 
+    <sc-if value="{{ viendoOtraCartera }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:10px 40px; background:#C08A3E1f; border-bottom:1px solid rgba(192,138,62,.35); font-size:13px; color:#8A5E1F">
+        <span>👁 Viendo la cartera de <strong>{{ viendoAgenteNombre }}</strong> — solo lectura, como administrador.</span>
+        <span onClick="{{ volverAMiCartera }}" onKeyDown="{{ volverAMiCarteraKey }}" role="button" tabIndex="0" style="font-weight:600; cursor:pointer; white-space:nowrap" style-hover="color:#6B4A1F">← Volver a mi cartera</span>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ loadError }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 40px; background:#B4553C1a; border-bottom:1px solid #B4553C55; font-size:13px; color:#8E3E29">
         <span>No se pudieron cargar algunos datos. Puede ser un problema de conexión pasajero.</span>
@@ -283,7 +291,9 @@
             <div style="font-family:'Newsreader', serif; font-size:26px; font-weight:600">Propiedades</div>
             <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:#6B7480">{{ propsCount }}</span>
           </div>
-          <div onClick="{{ abrirNuevaProp }}" onKeyDown="{{ abrirNuevaPropKey }}" role="button" tabIndex="0" style="margin-top:14px; background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px; text-align:center; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">+ Agregar propiedad</div>
+          <sc-if value="{{ puedeEditar }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ abrirNuevaProp }}" onKeyDown="{{ abrirNuevaPropKey }}" role="button" tabIndex="0" style="margin-top:14px; background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px; text-align:center; font-size:13.5px; font-weight:600; cursor:pointer" style-hover="background:#1B3040">+ Agregar propiedad</div>
+          </sc-if>
           <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
             <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
               <div onClick="{{ f.go }}" onKeyDown="{{ f.goKey }}" role="button" tabIndex="0" style="{{ f.style }}">{{ f.label }}</div>
@@ -301,8 +311,11 @@
                       <div style="font-size:14.5px; font-weight:600; line-height:1.3">{{ p.t }}</div>
                       <div style="display:flex; align-items:center; gap:6px; flex:none">
                         <span style="{{ p.badge }}">{{ p.est }}</span>
-                        <span onClick="{{ p.editar }}" onKeyDown="{{ p.editarKey }}" role="button" tabIndex="0" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
-                        <span onClick="{{ p.eliminar }}" onKeyDown="{{ p.eliminarKey }}" role="button" tabIndex="0" title="Eliminar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#B4553C; background:rgba(180,85,60,.12)">✕</span>
+                        <span onClick="{{ p.descargarPdf }}" onKeyDown="{{ p.descargarPdfKey }}" role="button" tabIndex="0" title="Descargar PDF" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#3E7C6B; background:rgba(62,124,107,.12)">⬇</span>
+                        <sc-if value="{{ p.puedeEditar }}" hint-placeholder-val="{{ true }}">
+                          <span onClick="{{ p.editar }}" onKeyDown="{{ p.editarKey }}" role="button" tabIndex="0" title="Editar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
+                          <span onClick="{{ p.eliminar }}" onKeyDown="{{ p.eliminarKey }}" role="button" tabIndex="0" title="Eliminar propiedad" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#B4553C; background:rgba(180,85,60,.12)">✕</span>
+                        </sc-if>
                       </div>
                     </div>
                     <div style="font-size:12.5px; color:#6B7480; margin-top:4px">{{ p.z }}</div>
@@ -340,7 +353,9 @@
             <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">Clientes</div>
             <div style="color:#5E6771; font-size:14.5px; margin-top:5px">Seguimiento del embudo, de primer contacto a cierre.</div>
           </div>
-          <div onClick="{{ abrirNuevoCliente }}" onKeyDown="{{ abrirNuevoClienteKey }}" role="button" tabIndex="0" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
+          <sc-if value="{{ puedeEditar }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ abrirNuevoCliente }}" onKeyDown="{{ abrirNuevoClienteKey }}" role="button" tabIndex="0" style="background:#101F2B; color:#F4F0E8; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap" style-hover="background:#1B3040">+ Agregar cliente</div>
+          </sc-if>
         </div>
         <div class="pt-pipeline" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-top:26px; align-items:start">
           <sc-for list="{{ pipeline }}" as="col" hint-placeholder-count="4">
@@ -354,10 +369,12 @@
                   <div style="background:#EFEAE0; border-radius:12px; padding:14px 15px" style-hover="background:#E7E0D3">
                     <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px">
                       <div style="font-size:13.5px; font-weight:600">{{ c.n }}</div>
-                      <div style="display:flex; align-items:center; gap:4px; flex:none">
-                        <span onClick="{{ c.editar }}" onKeyDown="{{ c.editarKey }}" role="button" tabIndex="0" title="Editar cliente" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
-                        <span onClick="{{ c.eliminar }}" onKeyDown="{{ c.eliminarKey }}" role="button" tabIndex="0" title="Eliminar cliente" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#B4553C; background:rgba(180,85,60,.12)">✕</span>
-                      </div>
+                      <sc-if value="{{ c.puedeEditar }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex; align-items:center; gap:4px; flex:none">
+                          <span onClick="{{ c.editar }}" onKeyDown="{{ c.editarKey }}" role="button" tabIndex="0" title="Editar cliente" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#8A5E1F; background:rgba(192,138,62,.12)">✎</span>
+                          <span onClick="{{ c.eliminar }}" onKeyDown="{{ c.eliminarKey }}" role="button" tabIndex="0" title="Eliminar cliente" style="cursor:pointer; font-size:12px; color:#8B939C; padding:2px 3px; border-radius:5px" style-hover="color:#B4553C; background:rgba(180,85,60,.12)">✕</span>
+                        </div>
+                      </sc-if>
                     </div>
                     <div style="font-size:12px; color:#6B7480; margin-top:3px; line-height:1.4">{{ c.busca }}</div>
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-top:11px">
@@ -411,6 +428,27 @@
               <span style="font-family:'JetBrains Mono', monospace; font-size:12.5px; color:#8A5E1F">{{ r.com }}</span>
             </div>
           </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isEquipo }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:38px 40px 56px">
+        <div style="font-family:'Newsreader', serif; font-size:30px; font-weight:600">Equipo</div>
+        <div style="color:#5E6771; font-size:14.5px; margin-top:5px">Cartera de todos los vendedores, en modo solo lectura.</div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:26px; max-width:640px">
+          <sc-for list="{{ agentesList }}" as="a" hint-placeholder-count="3">
+            <div style="background:#FBF9F5; border:1px solid rgba(20,33,43,.08); border-radius:14px; padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px">
+              <div>
+                <div style="font-size:14.5px; font-weight:600">{{ a.nombre }}</div>
+                <div style="font-family:'JetBrains Mono', monospace; font-size:10.5px; color:#8B939C; margin-top:2px">Plan {{ a.plan }} · desde {{ a.desde }}</div>
+              </div>
+              <span onClick="{{ a.ver }}" onKeyDown="{{ a.verKey }}" role="button" tabIndex="0" style="font-size:13px; font-weight:600; color:#8A5E1F; cursor:pointer; white-space:nowrap" style-hover="color:#6B4A1F">Ver cartera →</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ equipoVacio }}" hint-placeholder-val="{{ false }}">
+            <div style="color:#8B939C; font-size:13.5px; padding:10px 4px">No hay otros vendedores registrados todavía.</div>
+          </sc-if>
         </div>
       </div>
     </sc-if>
@@ -599,8 +637,8 @@ const clearCache = userId => {
 // Deep-linking por hash: cada pantalla principal tiene su propia URL
 // (#propiedades, #clientes, #comisiones), asi se puede compartir o
 // abrir un enlace directo a una pantalla especifica del dashboard.
-const HASH_TO_SCREEN = { resumen: "resumen", propiedades: "props", clientes: "clientes", comisiones: "comisiones" };
-const SCREEN_TO_HASH = { resumen: "resumen", props: "propiedades", clientes: "clientes", comisiones: "comisiones" };
+const HASH_TO_SCREEN = { resumen: "resumen", propiedades: "props", clientes: "clientes", comisiones: "comisiones", equipo: "equipo" };
+const SCREEN_TO_HASH = { resumen: "resumen", props: "propiedades", clientes: "clientes", comisiones: "comisiones", equipo: "equipo" };
 const screenFromHash = () => HASH_TO_SCREEN[(location.hash || "").replace("#", "")] || null;
 const setHashForScreen = screen => {
   const h = "#" + (SCREEN_TO_HASH[screen] || "resumen");
@@ -619,7 +657,10 @@ class Component extends DCLogic {
     npTitulo: "", npZona: "", npDescripcion: "", npTipo: "Casa", npEstado: "Disponible",
     npPrecio: "", npHabitaciones: "", npArea: "", npAreaUnidad: "m2", npLat: "", npLng: "",
     showAddClient: false, savingClient: false, ncError: "", ncEditId: null,
-    ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto"
+    ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto",
+    // Admin: navega la cartera de otros vendedores en modo solo lectura,
+    // sin perder su propio profile/plan (que no se tocan al cambiar de vista).
+    viendoAgenteId: null, viendoAgenteNombre: "", agentes: [], loadingAgentes: false
   };
   mapEl = null;
 
@@ -791,6 +832,101 @@ class Component extends DCLogic {
     if (userId) this.loadAll(userId);
   }
 
+  // Admin: trae la lista de todos los profiles (la politica RLS
+  // profiles_admin_read es la que hace esto posible) para elegir de quien
+  // ver la cartera. Solo lectura de nombre/plan/fecha, nada sensible.
+  async cargarAgentes() {
+    this.setState({ loadingAgentes: true });
+    const { data, error } = await sb.from("profiles").select("id, nombre, plan, created_at").order("nombre");
+    this.setState({ loadingAgentes: false, agentes: error ? [] : (data || []) });
+  }
+
+  // Reemplaza properties/clients/deals/... en el state por las del agente
+  // elegido (mismas politicas admin_read del lado de la BD). No toca
+  // profile/plan propios ni el cache local (el cache es solo para la
+  // propia cartera, revalidada en loadAll).
+  async cargarCarteraDe(agente) {
+    const ownId = this.state.session && this.state.session.user && this.state.session.user.id;
+    if (!ownId || agente.id === ownId) return;
+    this.setState({
+      loading: true, loadError: false,
+      viendoAgenteId: agente.id, viendoAgenteNombre: agente.nombre || "",
+      screen: "props"
+    });
+    setHashForScreen("props");
+    const attempt = async (build) => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 7000);
+      try { return await build(controller.signal); }
+      catch (e) { return { data: null, error: e }; }
+      finally { clearTimeout(timer); }
+    };
+    const [propsRes, clientsRes, dealsRes, actsRes, matchesRes, kpiRes, mesesRes] = await Promise.all([
+      attempt(sig => sb.from("properties").select("*").eq("user_id", agente.id).abortSignal(sig).order("created_at")),
+      attempt(sig => sb.from("clients").select("*").eq("user_id", agente.id).abortSignal(sig).order("created_at")),
+      attempt(sig => sb.from("deals").select("*, properties(titulo)").eq("user_id", agente.id).abortSignal(sig).order("fecha_cierre", { ascending: false })),
+      attempt(sig => sb.from("activities").select("*").eq("user_id", agente.id).abortSignal(sig).order("created_at", { ascending: false })),
+      attempt(sig => sb.from("matches").select("*, clients(nombre), properties(titulo)").eq("user_id", agente.id).abortSignal(sig)),
+      attempt(sig => sb.from("v_dashboard_kpis").select("*").eq("user_id", agente.id).abortSignal(sig).maybeSingle()),
+      attempt(sig => sb.from("v_comisiones_por_mes").select("*").eq("user_id", agente.id).abortSignal(sig).order("mes"))
+    ]);
+    const anyError = [propsRes, clientsRes, dealsRes, actsRes, matchesRes, kpiRes, mesesRes].some(r => r.error);
+    this.setState({
+      loading: false, loadError: anyError,
+      properties: propsRes.data || [], clients: clientsRes.data || [], deals: dealsRes.data || [],
+      activities: actsRes.data || [], matches: matchesRes.data || [], kpiRow: kpiRes.data || null, mesesRow: mesesRes.data || []
+    });
+    this.sendPropsToMap();
+  }
+
+  volverAMiCartera() {
+    const ownId = this.state.session && this.state.session.user && this.state.session.user.id;
+    this.setState({ viendoAgenteId: null, viendoAgenteNombre: "" });
+    if (ownId) this.loadAll(ownId);
+  }
+
+  // PDF generado 100% en el cliente (jsPDF) a partir de los datos ya
+  // cargados - no hay backend/endpoint propio que arme el documento.
+  descargarPropPDF(p) {
+    const doc = new jspdf.jsPDF();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(17);
+    doc.text(p.titulo || "Propiedad", 14, 20);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(139, 147, 156);
+    doc.text("PropTrack · San Pedro Sula, HN", 14, 27);
+    doc.setDrawColor(230, 226, 214);
+    doc.line(14, 32, 196, 32);
+
+    const campos = [
+      ["Zona", p.zona || "—"],
+      ["Tipo", p.tipo || "—"],
+      ["Estado", p.estado || "—"],
+      ["Precio", fmtL(p.precio)],
+      ["Habitaciones", p.habitaciones != null ? String(p.habitaciones) : "—"],
+      ["Área", fmtArea(p.area, p.area_unidad) || "—"],
+      ["Descripción", p.descripcion || "Sin descripción disponible."]
+    ];
+    doc.setFontSize(11);
+    let y = 44;
+    campos.forEach(([label, valor]) => {
+      doc.setTextColor(20, 33, 43);
+      doc.setFont("helvetica", "bold");
+      doc.text(label + ":", 14, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(94, 103, 113);
+      const texto = doc.splitTextToSize(String(valor), 130);
+      doc.text(texto, 55, y);
+      y += 7 * texto.length + 2;
+    });
+
+    const slug = (p.titulo || "propiedad").toLowerCase()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "propiedad";
+    doc.save(`${slug}.pdf`);
+  }
+
   // Enter en el buscador: no filtra solo la pantalla actual, salta a donde
   // realmente esté la coincidencia (propiedad o cliente), sin importar en
   // qué pantalla estaba el usuario cuando escribió.
@@ -830,12 +966,19 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state.screen;
+    const esAdmin = !!(this.state.profile && this.state.profile.role === "admin");
+    const puedeEditar = !this.state.viendoAgenteId;
     const items = [
       ["resumen", "Resumen", "◈"], ["props", "Propiedades", "⌂"],
       ["clientes", "Clientes", "◍"], ["comisiones", "Comisiones", "▤"]
     ];
+    if (esAdmin) items.push(["equipo", "Equipo", "🛡"]);
     const nav = items.map(([id, label, icon]) => {
-      const go = () => { this.setState({ screen: id }); setHashForScreen(id); };
+      const go = () => {
+        this.setState({ screen: id });
+        setHashForScreen(id);
+        if (id === "equipo") this.cargarAgentes();
+      };
       return {
         label, icon, go, goKey: this.onEnterKey(go),
         style: `display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:10px; cursor:pointer; transition:background .15s ease; color:${s === id ? "#101F2B" : "#C9D2DA"}; background:${s === id ? "#F4F0E8" : "transparent"}; font-weight:${s === id ? 600 : 500}`
@@ -869,11 +1012,18 @@ class Component extends DCLogic {
         if (e && e.stopPropagation) e.stopPropagation();
         this.eliminarProp(p.id, p.t);
       };
+      const descargarPdf = e => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        const raw = (this.state.properties || []).find(x => x.id === p.id);
+        if (raw) this.descargarPropPDF(raw);
+      };
       return {
         ...p,
         go, goKey: this.onEnterKey(go),
         editar, editarKey: this.onEnterKey(() => editar(null)),
         eliminar, eliminarKey: this.onEnterKey(() => eliminar(null)),
+        descargarPdf, descargarPdfKey: this.onEnterKey(() => descargarPdf(null)),
+        puedeEditar,
         cardStyle: `background:#FBF9F5; border:1px solid ${this.state.activa === p.id ? "rgba(192,138,62,.75)" : "rgba(20,33,43,.08)"}; border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s ease`,
         badge: `font-family:'JetBrains Mono', monospace; font-size:9.5px; letter-spacing:.08em; padding:4px 8px; border-radius:99px; white-space:nowrap; color:${col[p.est]}; background:${col[p.est]}1f`,
         expandido: this.state.activa === p.id,
@@ -1042,8 +1192,24 @@ class Component extends DCLogic {
       propsCount: `${propsData.length} activas`,
       fechaHoy: fmtFecha(new Date()),
       saludo: `Buen día, ${((st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel").split(" ")[0]}`,
-      title: { resumen: "Resumen", props: "Propiedades", clientes: "Clientes", comisiones: "Comisiones" }[s],
-      isResumen: s === "resumen", isProps: s === "props", isClientes: s === "clientes", isComisiones: s === "comisiones",
+      title: { resumen: "Resumen", props: "Propiedades", clientes: "Clientes", comisiones: "Comisiones", equipo: "Equipo" }[s],
+      isResumen: s === "resumen", isProps: s === "props", isClientes: s === "clientes", isComisiones: s === "comisiones", isEquipo: s === "equipo",
+      puedeEditar,
+      viendoOtraCartera: !!this.state.viendoAgenteId,
+      viendoAgenteNombre: this.state.viendoAgenteNombre,
+      volverAMiCartera: () => this.volverAMiCartera(),
+      volverAMiCarteraKey: this.onEnterKey(() => this.volverAMiCartera()),
+      agentesList: (this.state.agentes || [])
+        .filter(a => a.id !== (st.session && st.session.user && st.session.user.id))
+        .map(a => {
+          const ver = () => this.cargarCarteraDe(a);
+          return {
+            nombre: a.nombre || "(sin nombre)", plan: a.plan || "mensual",
+            desde: fmtFecha(new Date(a.created_at)),
+            ver, verKey: this.onEnterKey(ver)
+          };
+        }),
+      equipoVacio: !this.state.loadingAgentes && (this.state.agentes || []).length <= 1,
       goClientes: () => { this.setState({ screen: "clientes" }); setHashForScreen("clientes"); },
       goClientesKey: this.onEnterKey(() => this.setState({ screen: "clientes" })),
       mapRef: el => { this.mapEl = el; },
@@ -1080,7 +1246,8 @@ class Component extends DCLogic {
               pres: fmtL(c.presupuesto),
               dias: etapa === "Cerrado" ? "cerrado" : fmtDias(c.created_at),
               editar, editarKey: this.onEnterKey(() => editar(null)),
-              eliminar, eliminarKey: this.onEnterKey(() => eliminar(null))
+              eliminar, eliminarKey: this.onEnterKey(() => eliminar(null)),
+              puedeEditar
             };
           });
         return { label: etapa, n: String(cards.length), cards };
