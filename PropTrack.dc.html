@@ -601,6 +601,13 @@ const fmtDias = iso => {
 };
 const MESES_ABR = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
 const fmtFecha = date => `${date.getDate()} ${MESES_ABR[date.getMonth()]} ${date.getFullYear()}`;
+const fmtHora = date => date.toLocaleTimeString("es-HN", { hour: "2-digit", minute: "2-digit" });
+const saludoPorHora = () => {
+  const h = new Date().getHours();
+  if (h < 12) return "Buenos días";
+  if (h < 19) return "Buenas tardes";
+  return "Buenas noches";
+};
 const fmtHace = iso => {
   const mins = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
   if (mins < 60) return `hace ${mins} min`;
@@ -660,7 +667,8 @@ class Component extends DCLogic {
     ncNombre: "", ncBusca: "", ncPresupuesto: "", ncEtapa: "Contacto",
     // Admin: navega la cartera de otros vendedores en modo solo lectura,
     // sin perder su propio profile/plan (que no se tocan al cambiar de vista).
-    viendoAgenteId: null, viendoAgenteNombre: "", agentes: [], loadingAgentes: false
+    viendoAgenteId: null, viendoAgenteNombre: "", agentes: [], loadingAgentes: false,
+    tick: 0
   };
   mapEl = null;
 
@@ -690,6 +698,11 @@ class Component extends DCLogic {
       const d = e.data || {};
       if (d.type === "ready") this.sendPropsToMap();
     });
+    // Sin esto, el saludo y la hora del header quedarian congelados en el
+    // momento del login hasta el proximo re-render por otra razon (un
+    // clic, una carga). No necesita limpieza: el componente vive toda la
+    // sesion de la pestana.
+    setInterval(() => this.setState({ tick: this.state.tick + 1 }), 30000);
   }
 
   sendPropsToMap() {
@@ -1190,8 +1203,8 @@ class Component extends DCLogic {
       ...auth,
       nav, filtros, propsList,
       propsCount: `${propsData.length} activas`,
-      fechaHoy: fmtFecha(new Date()),
-      saludo: `Buen día, ${((st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel").split(" ")[0]}`,
+      fechaHoy: `${fmtFecha(new Date())} · ${fmtHora(new Date())}`,
+      saludo: `${saludoPorHora()}, ${((st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel").split(" ")[0]}`,
       title: { resumen: "Resumen", props: "Propiedades", clientes: "Clientes", comisiones: "Comisiones", equipo: "Equipo" }[s],
       isResumen: s === "resumen", isProps: s === "props", isClientes: s === "clientes", isComisiones: s === "comisiones", isEquipo: s === "equipo",
       puedeEditar,
