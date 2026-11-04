@@ -49,7 +49,6 @@
         <div style="font-family:'Newsreader', serif; font-size:28px; font-weight:600; margin-top:30px">{{ authTitle }}</div>
         <div style="font-size:13.5px; color:#5E6771; margin-top:5px">{{ authSub }}</div>
 
-        <sc-if value="{{ isAuthNormal }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex; flex-direction:column; gap:14px; margin-top:26px">
           <sc-if value="{{ isRegistro }}" hint-placeholder-val="{{ false }}">
             <label style="display:flex; flex-direction:column; gap:7px">
@@ -84,67 +83,8 @@
 
           <div onClick="{{ entrar }}" onKeyDown="{{ entrarKey }}" role="button" tabIndex="0" style="{{ authCtaStyle }}" style-hover="background:#1B3040">{{ authCta }}</div>
 
-          <div style="display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:#6B7480">
-            <span onClick="{{ abrirOlvide }}" onKeyDown="{{ abrirOlvideKey }}" role="button" tabIndex="0" style="cursor:pointer" style-hover="color:#8A5E1F">¿Olvidaste tu contraseña?</span>
-            <span style="font-family:'JetBrains Mono', monospace; font-size:10.5px">$7 / MES</span>
-          </div>
+          <div style="text-align:center; font-family:'JetBrains Mono', monospace; font-size:10.5px; color:#6B7480">$7 / MES</div>
         </div>
-        </sc-if>
-
-        <sc-if value="{{ isOlvideEmail }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex; flex-direction:column; gap:14px; margin-top:26px">
-          <label style="display:flex; flex-direction:column; gap:7px">
-            <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#6B7480">CORREO REGISTRADO</span>
-            <input value="{{ recEmail }}" onChange="{{ setRecEmail }}" placeholder="tucorreo@ejemplo.com" style="border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 14px; font-family:'Work Sans', sans-serif; font-size:14px; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
-          </label>
-
-          <sc-if value="{{ mostrarRecMsg }}" hint-placeholder-val="{{ false }}">
-            <div style="{{ recMsgStyle }}">{{ recMsgText }}</div>
-          </sc-if>
-
-          <div onClick="{{ enviarCodigo }}" onKeyDown="{{ enviarCodigoKey }}" role="button" tabIndex="0" style="{{ recCtaStyle }}" style-hover="background:#1B3040">{{ recCtaLabel }}</div>
-          <div onClick="{{ volverLogin }}" onKeyDown="{{ volverLoginKey }}" role="button" tabIndex="0" style="font-size:12.5px; color:#6B7480; cursor:pointer; text-align:center" style-hover="color:#8A5E1F">← Volver a iniciar sesión</div>
-        </div>
-        </sc-if>
-
-        <sc-if value="{{ isOlvideCodigo }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex; flex-direction:column; gap:14px; margin-top:26px">
-          <label style="display:flex; flex-direction:column; gap:7px">
-            <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#6B7480">CÓDIGO ENVIADO A {{ recEmail }}</span>
-            <input value="{{ recCodigo }}" onChange="{{ setRecCodigo }}" placeholder="123456" style="border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 14px; font-family:'JetBrains Mono', monospace; font-size:16px; letter-spacing:.25em; text-align:center; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
-          </label>
-
-          <sc-if value="{{ mostrarRecMsg }}" hint-placeholder-val="{{ false }}">
-            <div style="{{ recMsgStyle }}">{{ recMsgText }}</div>
-          </sc-if>
-
-          <div onClick="{{ verificarCodigo }}" onKeyDown="{{ verificarCodigoKey }}" role="button" tabIndex="0" style="{{ recCtaStyle }}" style-hover="background:#1B3040">{{ recCtaLabel }}</div>
-          <div style="display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:#6B7480">
-            <span onClick="{{ enviarCodigo }}" onKeyDown="{{ enviarCodigoKey }}" role="button" tabIndex="0" style="cursor:pointer" style-hover="color:#8A5E1F">Reenviar código</span>
-            <span onClick="{{ volverLogin }}" onKeyDown="{{ volverLoginKey }}" role="button" tabIndex="0" style="cursor:pointer" style-hover="color:#8A5E1F">← Volver a iniciar sesión</span>
-          </div>
-        </div>
-        </sc-if>
-
-        <sc-if value="{{ isOlvideNueva }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex; flex-direction:column; gap:14px; margin-top:26px">
-          <label style="display:flex; flex-direction:column; gap:7px">
-            <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#6B7480">NUEVA CONTRASEÑA</span>
-            <input value="{{ recNueva }}" onChange="{{ setRecNueva }}" type="password" placeholder="••••••••" style="border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 14px; font-family:'Work Sans', sans-serif; font-size:14px; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
-          </label>
-
-          <label style="display:flex; flex-direction:column; gap:7px">
-            <span style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.12em; color:#6B7480">CONFIRMAR CONTRASEÑA</span>
-            <input value="{{ recNueva2 }}" onChange="{{ setRecNueva2 }}" type="password" placeholder="••••••••" style="border:1px solid rgba(20,33,43,.16); background:#FBF9F5; border-radius:10px; padding:12px 14px; font-family:'Work Sans', sans-serif; font-size:14px; color:#14212B; outline:none" style-focus="border-color:#C08A3E">
-          </label>
-
-          <sc-if value="{{ mostrarRecMsg }}" hint-placeholder-val="{{ false }}">
-            <div style="{{ recMsgStyle }}">{{ recMsgText }}</div>
-          </sc-if>
-
-          <div onClick="{{ guardarNuevaClave }}" onKeyDown="{{ guardarNuevaClaveKey }}" role="button" tabIndex="0" style="{{ recCtaStyle }}" style-hover="background:#1B3040">{{ recCtaLabel }}</div>
-        </div>
-        </sc-if>
       </div>
     </div>
   </div>
@@ -722,8 +662,6 @@ class Component extends DCLogic {
     vista: "login", modo: "Ingresar", plan: "mensual",
     nombre: "", usuario: "", usernameNuevo: "", clave: "", verClave: false, error: false,
     loading: false, authMsg: "", busqueda: "", loadError: false,
-    recStep: null, recEmail: "", recCodigo: "", recNueva: "", recNueva2: "",
-    recLoading: false, recError: false, recMsg: "",
     session: null, profile: null,
     properties: [], clients: [], deals: [], activities: [], matches: [], kpiRow: null, mesesRow: [],
     showAddProp: false, savingProp: false, npError: "", npEditId: null,
@@ -1193,50 +1131,6 @@ class Component extends DCLogic {
       }
     };
 
-    const abrirOlvide = () => this.setState({
-      recStep: "email", recEmail: st.usuario.includes("@") ? st.usuario.trim() : "",
-      recCodigo: "", recNueva: "", recNueva2: "", recError: false, recMsg: ""
-    });
-    const volverLogin = () => this.setState({ recStep: null, recError: false, recMsg: "" });
-
-    const enviarCodigo = async () => {
-      if (st.recLoading) return;
-      const email = st.recEmail.trim();
-      if (!email.includes("@")) return this.setState({ recError: true, recMsg: "Ingresá un correo válido." });
-      this.setState({ recLoading: true, recError: false, recMsg: "" });
-      const { error } = await sb.auth.resetPasswordForEmail(email);
-      if (error) return this.setState({ recLoading: false, recError: true, recMsg: error.message });
-      this.setState({
-        recLoading: false, recStep: "codigo", recCodigo: "", recError: false,
-        recMsg: "Si ese correo tiene una cuenta, te enviamos un código de verificación."
-      });
-    };
-
-    const verificarCodigo = async () => {
-      if (st.recLoading) return;
-      const codigo = st.recCodigo.trim();
-      if (!codigo) return this.setState({ recError: true, recMsg: "Ingresá el código que te llegó por correo." });
-      this.setState({ recLoading: true, recError: false, recMsg: "" });
-      const { error } = await sb.auth.verifyOtp({ email: st.recEmail.trim(), token: codigo, type: "recovery" });
-      if (error) return this.setState({ recLoading: false, recError: true, recMsg: "Código incorrecto o vencido. Pedí uno nuevo." });
-      this.setState({ recLoading: false, recStep: "nueva", recError: false, recMsg: "" });
-    };
-
-    const guardarNuevaClave = async () => {
-      if (st.recLoading) return;
-      if (st.recNueva.length < 6) return this.setState({ recError: true, recMsg: "La contraseña debe tener al menos 6 caracteres." });
-      if (st.recNueva !== st.recNueva2) return this.setState({ recError: true, recMsg: "Las contraseñas no coinciden." });
-      this.setState({ recLoading: true, recError: false, recMsg: "" });
-      const { error } = await sb.auth.updateUser({ password: st.recNueva });
-      if (error) return this.setState({ recLoading: false, recError: true, recMsg: error.message });
-      await sb.auth.signOut();
-      this.setState({
-        recLoading: false, recStep: null, recEmail: "", recCodigo: "", recNueva: "", recNueva2: "",
-        modo: "Ingresar", usuario: st.recEmail.trim(), clave: "", error: true,
-        authMsg: "Contraseña actualizada. Iniciá sesión con tu nueva contraseña."
-      });
-    };
-
     const activar = async () => {
       const userId = st.session && st.session.user && st.session.user.id;
       if (userId) await sb.from("profiles").update({ plan: st.plan }).eq("id", userId);
@@ -1254,27 +1148,16 @@ class Component extends DCLogic {
       });
     };
 
-    const recTitles = {
-      email: ["Recuperar contraseña", "Te enviamos un código de verificación a tu correo."],
-      codigo: ["Verificá el código", "Escribí el código de 6 dígitos que te llegó por correo."],
-      nueva: ["Elegí una nueva contraseña", "Ya verificamos tu correo, ahora definí tu nueva contraseña."]
-    };
-    const [recTitle, recSub] = recTitles[st.recStep] || [];
-
     const auth = {
       isLogin: st.vista === "login", isPago: st.vista === "pago", isApp: st.vista === "app",
       isRegistro: registro,
-      isAuthNormal: !st.recStep,
-      isOlvideEmail: st.recStep === "email",
-      isOlvideCodigo: st.recStep === "codigo",
-      isOlvideNueva: st.recStep === "nueva",
-      authTitle: st.recStep ? recTitle : (registro ? "Creá tu cuenta" : "Bienvenido de nuevo"),
-      authSub: st.recStep ? recSub : (registro ? "14 días gratis, sin cargo hasta el día 15." : "Ingresá con tu usuario y contraseña."),
+      authTitle: registro ? "Creá tu cuenta" : "Bienvenido de nuevo",
+      authSub: registro ? "14 días gratis, sin cargo hasta el día 15." : "Ingresá con tu usuario y contraseña.",
       authCta: st.loading ? "Un momento…" : (registro ? "Continuar al pago" : "Entrar a PropTrack"),
       authCtaStyle: `background:#101F2B; color:#F4F0E8; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; margin-top:4px; ${st.loading ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
       entrarKey: this.onEnterKey(entrar),
       tabs: ["Ingresar", "Registrarme"].map(label => {
-        const go = () => this.setState({ modo: label, error: false, recStep: null });
+        const go = () => this.setState({ modo: label, error: false });
         return {
           label, go, goKey: this.onEnterKey(go),
           style: `flex:1; text-align:center; padding:9px; border-radius:99px; font-size:13.5px; font-weight:600; cursor:pointer; background:${st.modo === label ? "#FBF9F5" : "transparent"}; color:${st.modo === label ? "#14212B" : "#6B7480"}`
@@ -1297,22 +1180,6 @@ class Component extends DCLogic {
       entrar,
       activar, activarKey: this.onEnterKey(activar),
       salir, salirKey: this.onEnterKey(salir),
-      abrirOlvide, abrirOlvideKey: this.onEnterKey(abrirOlvide),
-      volverLogin, volverLoginKey: this.onEnterKey(volverLogin),
-      recEmail: st.recEmail, setRecEmail: e => this.setState({ recEmail: e.target.value, recError: false }),
-      recCodigo: st.recCodigo, setRecCodigo: e => this.setState({ recCodigo: e.target.value, recError: false }),
-      recNueva: st.recNueva, setRecNueva: e => this.setState({ recNueva: e.target.value, recError: false }),
-      recNueva2: st.recNueva2, setRecNueva2: e => this.setState({ recNueva2: e.target.value, recError: false }),
-      mostrarRecMsg: !!st.recMsg,
-      recMsgText: st.recMsg,
-      recMsgStyle: st.recError
-        ? "background:#B4553C1a; border:1px solid #B4553C55; border-radius:10px; padding:10px 13px; font-size:12.5px; color:#8E3E29"
-        : "background:#3E7C6B1a; border:1px solid #3E7C6B55; border-radius:10px; padding:10px 13px; font-size:12.5px; color:#2E5B4D",
-      recCtaStyle: `background:#101F2B; color:#F4F0E8; border-radius:10px; padding:14px; text-align:center; font-size:14.5px; font-weight:600; margin-top:4px; ${st.recLoading ? "opacity:.6; cursor:default;" : "cursor:pointer;"}`,
-      recCtaLabel: st.recLoading ? "Un momento…" : { email: "Enviar código", codigo: "Verificar código", nueva: "Guardar contraseña" }[st.recStep],
-      enviarCodigo, enviarCodigoKey: this.onEnterKey(enviarCodigo),
-      verificarCodigo, verificarCodigoKey: this.onEnterKey(verificarCodigo),
-      guardarNuevaClave, guardarNuevaClaveKey: this.onEnterKey(guardarNuevaClave),
       planes, planNombre: planActual.nombre, planPrecio: planActual.precio, planPeriodo: planActual.periodo,
       nombreCuenta: (st.profile && st.profile.nombre) || st.nombre.trim() || "Dariel Mencía",
       fechaPrueba: fmtFecha(new Date(Date.now() + 14 * 86400000))
